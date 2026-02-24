@@ -1,3 +1,14 @@
+# ── Security & local machine files ─────────────────────────────────
+# macOS metadata
+.DS_Store
+**/.DS_Store
+# Vite production build — committed separately if deploying via CI
+dist/
+# Local secrets (never commit these)
+.env.local
+.env.production
+# ────────────────────────────────────────────────────
+
 # Logs
 logs
 *.log
