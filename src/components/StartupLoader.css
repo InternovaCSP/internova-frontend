@@ -1,0 +1,45 @@
+.startup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--bg, #F8F9FA);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.startup-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.05);
+    /* Slight zoom out while fading */
+}
+
+.startup-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.startup-logo-pulse {
+    height: 240px;
+    max-width: 90vw;
+    object-fit: contain;
+    animation: gentlePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes gentlePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: .7;
+        transform: scale(0.95);
+    }
+}
