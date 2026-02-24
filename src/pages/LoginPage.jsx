@@ -38,13 +38,13 @@ export default function LoginPage() {
     return (
         <div className="auth-page">
             <div className="auth-card">
-                <div className="auth-logo">Internova</div>
+                <img src="/logo-long.png" alt="Internova" className="auth-logo" style={{ height: '40px', objectFit: 'contain', marginBottom: '0.75rem', display: 'block' }} />
                 <p className="auth-subtitle">Sign in to your account</p>
 
-                {error && <div className="alert alert-error">{error}</div>}
+                {error && <div className="alert alert-error stagger-1">{error}</div>}
 
                 <form onSubmit={handleSubmit} noValidate>
-                    <div className="form-group">
+                    <div className="form-group stagger-1">
                         <label htmlFor="email">Email</label>
                         <input
                             id="email"
@@ -57,7 +57,7 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group stagger-2">
                         <label htmlFor="password">Password</label>
                         <input
                             id="password"
@@ -70,9 +70,9 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    <div className="divider" />
+                    <div className="divider stagger-3" />
 
-                    <button type="submit" className="btn btn-primary" disabled={loading}>
+                    <button type="submit" className="btn btn-primary stagger-3" disabled={loading}>
                         {loading ? 'Signing in…' : 'Sign In'}
                     </button>
                 </form>

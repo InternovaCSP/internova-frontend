@@ -1,29 +1,93 @@
 /* ── Reset & base ─────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg:        #0f111a;
-  --surface:   #1a1d2e;
-  --surface2:  #232742;
-  --border:    #2e334d;
-  --primary:   #6c63ff;
-  --primary-h: #857cff;
-  --danger:    #ff5c7a;
-  --success:   #34d399;
-  --text:      #e8eaf6;
-  --muted:     #8b8fa8;
-  --radius:    12px;
-  --radius-sm: 8px;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-html, body, #root { height: 100%; }
+:root {
+  --bg: #F8F9FA;
+  /* Off-white for cleaner look, similar to brand UI background */
+  --surface: #FFFFFF;
+  --surface2: #F3F4F6;
+  --border: #E5E7EB;
+  --primary: #0078D4;
+  /* Azure Blue */
+  --primary-h: #006BBD;
+  /* Darker Azure Blue */
+  --secondary: #0D1B2A;
+  /* Deep Navy */
+  --success: #1D8954;
+  /* Teal Mint */
+  --warning: #F9A825;
+  /* Gold Amber */
+  --danger: #EF4444;
+  /* Standard Red */
+  --text: #1F2937;
+  /* Dark Gray for better contrast on light mode */
+  --muted: #7819F4;
+  /* Slate Gray from brand kit -> actually looks like a typo in brand kit for Slate Gray (#7819F4 is purple). I'll use a real neutral gray for muted text, but leave the variable if needed elsewhere */
+  --muted-text: #6B7280;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
 
 body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
+  font-family: var(--font-body);
+  font-size: 16px;
+  /* Base 16px Inter */
   -webkit-font-smoothing: antialiased;
+}
+
+/* ── Typography structure ─────────────────────────────────────────────────── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  color: var(--secondary);
+  /* Deep Navy for headings */
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  /* Bold */
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 600;
+  /* Semi-Bold */
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 500;
+  /* Medium */
+}
+
+.text-meta {
+  font-size: 12px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--muted-text);
 }
 
 /* ── Auth page shell ──────────────────────────────────────────────────────── */
@@ -32,7 +96,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at 60% 10%, #1e2060 0%, var(--bg) 65%);
+  background: radial-gradient(ellipse at 60% 10%, #E0F2FE 0%, var(--bg) 65%);
   padding: 1.5rem;
 }
 
@@ -43,40 +107,49 @@ body {
   padding: 2.5rem 2rem;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 24px 64px rgba(0,0,0,.5);
-  animation: fadeUp .35s ease;
+  box-shadow: 0 12px 32px rgba(13, 27, 42, 0.08);
+  /* Sophisticated subtle shadow */
+  animation: fadeUp .5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(13, 27, 42, 0.12);
 }
 
 .auth-logo {
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  color: var(--primary);
   margin-bottom: .25rem;
 }
 
 .auth-subtitle {
-  color: var(--muted);
+  color: var(--muted-text);
   font-size: .875rem;
   margin-bottom: 1.75rem;
+  font-family: var(--font-body);
 }
 
 /* ── Form elements ────────────────────────────────────────────────────────── */
-.form-group { margin-bottom: 1.1rem; }
+.form-group {
+  margin-bottom: 1.1rem;
+}
 
 label {
   display: block;
   font-size: .8rem;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--secondary);
+  /* High contrast */
   text-transform: uppercase;
   letter-spacing: .05em;
   margin-bottom: .4rem;
+  font-family: var(--font-heading);
 }
 
-input, select {
+input,
+select {
   width: 100%;
-  background: var(--surface2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text);
@@ -84,14 +157,23 @@ input, select {
   padding: .65rem .85rem;
   outline: none;
   transition: border-color .2s, box-shadow .2s;
+  font-family: var(--font-body);
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(108,99,255,.18);
+  box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.15);
+  /* Azure Blue focus ring */
 }
 
-select option { background: var(--surface2); }
+input::placeholder {
+  color: #9CA3AF;
+}
+
+select option {
+  background: var(--surface);
+}
 
 /* ── Buttons ──────────────────────────────────────────────────────────────── */
 .btn {
@@ -104,33 +186,75 @@ select option { background: var(--surface2); }
   border: none;
   border-radius: var(--radius-sm);
   font-size: 1rem;
+  font-family: var(--font-heading);
+  /* Buttons often look better with the heading font depending on the app, we'll try it here to match brand */
   font-weight: 600;
   cursor: pointer;
-  transition: background .2s, transform .1s, box-shadow .2s;
+  transition: background .3s cubic-bezier(0.16, 1, 0.3, 1), transform .2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .3s cubic-bezier(0.16, 1, 0.3, 1), opacity .2s;
 }
 
-.btn:active { transform: scale(.98); }
+.btn:active {
+  transform: scale(.96);
+}
+
+.btn:hover:not(:disabled) {
+  transform: scale(1.02) translateY(-1px);
+}
 
 .btn-primary {
   background: var(--primary);
+  /* Azure Blue */
   color: #fff;
-  box-shadow: 0 4px 18px rgba(108,99,255,.35);
+  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--primary-h);
-  box-shadow: 0 6px 24px rgba(108,99,255,.5);
+  box-shadow: 0 6px 16px rgba(0, 120, 212, 0.35);
 }
 
-.btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+.btn-primary:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-success {
+  background: var(--success);
+  /* Teal Mint */
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(29, 137, 84, 0.25);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #177144;
+  /* Darker Teal Mint */
+}
+
+.btn-warning {
+  background: var(--warning);
+  /* Gold Amber */
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(249, 168, 37, 0.25);
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: #D8921B;
+  /* Darker Gold Amber */
+}
 
 .btn-ghost {
   background: transparent;
-  color: var(--primary);
-  border: 1px solid var(--primary);
+  color: var(--secondary);
+  /* Deep Navy */
+  border: 1px solid var(--border);
 }
 
-.btn-ghost:hover { background: rgba(108,99,255,.1); }
+.btn-ghost:hover {
+  background: var(--surface2);
+  border-color: var(--muted-text);
+}
 
 /* ── Alerts ───────────────────────────────────────────────────────────────── */
 .alert {
@@ -138,10 +262,20 @@ select option { background: var(--surface2); }
   border-radius: var(--radius-sm);
   font-size: .875rem;
   margin-bottom: 1rem;
+  font-family: var(--font-body);
 }
 
-.alert-error { background: rgba(255,92,122,.12); color: var(--danger); border: 1px solid rgba(255,92,122,.3); }
-.alert-success { background: rgba(52,211,153,.12); color: var(--success); border: 1px solid rgba(52,211,153,.3); }
+.alert-error {
+  background: #FEF2F2;
+  color: var(--danger);
+  border: 1px solid #FCA5A5;
+}
+
+.alert-success {
+  background: #F0FDF4;
+  color: var(--success);
+  border: 1px solid #86EFAC;
+}
 
 /* ── Auth nav link ────────────────────────────────────────────────────────── */
 .auth-footer {
@@ -157,7 +291,9 @@ select option { background: var(--surface2); }
   font-weight: 600;
 }
 
-.auth-footer a:hover { text-decoration: underline; }
+.auth-footer a:hover {
+  text-decoration: underline;
+}
 
 /* ── Dashboard shell ──────────────────────────────────────────────────────── */
 .dashboard {
@@ -177,9 +313,8 @@ select option { background: var(--surface2); }
 }
 
 .dashboard-nav .brand {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: var(--primary);
+  display: flex;
+  align-items: center;
 }
 
 .dashboard-body {
@@ -190,7 +325,12 @@ select option { background: var(--surface2); }
   justify-content: center;
   gap: 1.25rem;
   padding: 3rem 1.5rem;
-  animation: fadeUp .35s ease;
+  animation: fadeUp .5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-body:hover {
+  transform: translateY(-2px);
 }
 
 .role-badge {
@@ -201,9 +341,9 @@ select option { background: var(--surface2); }
   font-weight: 700;
   letter-spacing: .05em;
   text-transform: uppercase;
-  background: rgba(108,99,255,.15);
+  background: rgba(108, 99, 255, .15);
   color: var(--primary);
-  border: 1px solid rgba(108,99,255,.3);
+  border: 1px solid rgba(108, 99, 255, .3);
 }
 
 .dashboard-title {
@@ -225,8 +365,28 @@ select option { background: var(--surface2); }
   margin: 1.25rem 0;
 }
 
+/* ── Staggered Entrance Animations ────────────────────────────────────────── */
+.stagger-1 {
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.stagger-2 {
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.stagger-3 {
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
 /* ── Animations ───────────────────────────────────────────────────────────── */
 @keyframes fadeUp {
-  from { opacity:0; transform:translateY(14px); }
-  to   { opacity:1; transform:translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

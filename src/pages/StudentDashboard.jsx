@@ -13,7 +13,7 @@ export default function StudentDashboard() {
     return (
         <div className="dashboard">
             <nav className="dashboard-nav">
-                <span className="brand">Internova</span>
+                <img src="/logo-long.png" alt="Internova" className="brand" style={{ height: '28px', objectFit: 'contain' }} />
                 <button className="btn btn-ghost" style={{ width: 'auto', padding: '.45rem 1rem' }} onClick={handleLogout}>
                     Sign Out
                 </button>
