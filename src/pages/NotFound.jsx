@@ -1,18 +1,16 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
-function NotFound() {
+export default function NotFound() {
+    const navigate = useNavigate()
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-            <h1 className="text-6xl font-bold text-gray-800 mb-4">404</h1>
-            <p className="text-xl text-gray-600 mb-8">Page Not Found</p>
-            <Link
-                to="/hello"
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-                Go Home
-            </Link>
+        <div className="auth-page">
+            <div className="auth-card" style={{ textAlign: 'center' }}>
+                <div className="auth-logo">404</div>
+                <p className="auth-subtitle">Page not found</p>
+                <button className="btn btn-primary" onClick={() => navigate('/login', { replace: true })}>
+                    Go to Login
+                </button>
+            </div>
         </div>
     )
 }
-
-export default NotFound
