@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
+import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import StudentDashboard from './pages/StudentDashboard'
@@ -10,8 +11,8 @@ import NotFound from './pages/NotFound'
 function App() {
     return (
         <Routes>
-            {/* Public — redirect root to /login */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            {/* Public — root shows the landing page */}
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
