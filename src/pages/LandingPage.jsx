@@ -33,7 +33,7 @@ export default function LandingPage() {
                         <img src="/logo-mono-long.png" alt="InterNova" />
                     </Link>
                     <div className="lp-nav-links">
-                        <a href="#internships" className="lp-nav-link">Internships</a>
+                        <Link to="/internships" className="lp-nav-link">Internships</Link>
                         <a href="#projects" className="lp-nav-link">Projects</a>
                         <a href="#competitions" className="lp-nav-link">Competitions</a>
                     </div>
@@ -433,7 +433,7 @@ export default function LandingPage() {
                         </div>
                         <div className="lp-footer-col">
                             <div className="lp-footer-col-title">Product</div>
-                            <a href="#" className="lp-footer-link">Internships</a>
+                            <Link to="/internships" className="lp-footer-link">Internships</Link>
                             <a href="#" className="lp-footer-link">Projects</a>
                             <a href="#" className="lp-footer-link">Competitions</a>
                         </div>

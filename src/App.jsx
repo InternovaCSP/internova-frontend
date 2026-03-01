@@ -8,12 +8,14 @@ import CompanyDashboard from './pages/CompanyDashboard'
 import AdminDashboard from './pages/AdminDashboard'
 import StudentProfilePage from './pages/StudentProfilePage'
 import NotFound from './pages/NotFound'
+import InternshipsPage from './pages/InternshipsPage'
 
 function App() {
     return (
         <Routes>
             {/* Public */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/internships" element={<InternshipsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 

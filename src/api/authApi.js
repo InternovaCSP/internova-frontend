@@ -34,4 +34,9 @@ export const fetchMe = async () => {
     return response.data;
 };
 
+export const fetchStudentProfile = async () => {
+    const response = await apiClient.get('/api/student/profile');
+    return response.data;
+};
+
 export default apiClient;
