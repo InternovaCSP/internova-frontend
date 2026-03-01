@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Lock } from 'lucide-react';
+import { Eye, EyeOff, Lock, AlertCircle } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
+import { login } from '../api/authApi';
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -11,21 +12,30 @@ export default function LoginPage() {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setErrorMsg(''); // Clear error on change
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+        setErrorMsg('');
 
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            const data = await login(formData.email, formData.password);
+            // Save JWT from AuthResponse DTO
+            localStorage.setItem('internova_token', data.token);
+            // Decode or store user meta if needed: data.userId, data.email, data.role
+            // Route back to home page or specific portal
+            navigate('/');
+        } catch (error) {
+            setErrorMsg(error.response?.data?.error || 'Failed to connect to the server.');
+        } finally {
             setIsLoading(false);
-            console.log('Login attempt:', formData);
-            // navigate('/dashboard');
-        }, 1200);
+        }
     };
 
     return (
@@ -39,6 +49,12 @@ export default function LoginPage() {
                 </div>
 
                 <form onSubmit={handleSubmit}>
+                    {errorMsg && (
+                        <div style={{ backgroundColor: '#fef2f2', color: 'var(--auth-error)', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <AlertCircle size={16} /> {errorMsg}
+                        </div>
+                    )}
+
                     <div className="form-group">
                         <label className="form-label" htmlFor="email">Email Address</label>
                         <input

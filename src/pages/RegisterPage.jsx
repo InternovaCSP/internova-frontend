@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Building2, GraduationCap, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, Building2, GraduationCap, ShieldCheck, AlertCircle } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
+import { register } from '../api/authApi';
 
 export default function RegisterPage() {
     const navigate = useNavigate();
-    const [role, setRole] = useState('student');
+    const [role, setRole] = useState('Student');
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
         password: '',
         confirmPassword: '',
-        // Dynamic Fields
+        // Dynamic Fields (Not currently saved to backend DTO, but kept for UI structure)
         universityId: '',
         department: '',
         companyName: '',
@@ -19,21 +20,52 @@ export default function RegisterPage() {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setErrorMsg('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setErrorMsg('');
+
+        if (formData.password !== formData.confirmPassword) {
+            setErrorMsg("Passwords do not match.");
+            return;
+        }
+
+        if (role === 'Admin') {
+            setErrorMsg("Admin accounts cannot be self-registered.");
+            return;
+        }
+
         setIsLoading(true);
 
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            // Map frontend state to backend DTO: { FullName, Email, Password, Role }
+            await register({
+                FullName: formData.fullName,
+                Email: formData.email,
+                Password: formData.password,
+                Role: role
+            });
+
+            // Registration successful! Redirecting to login to get a fresh JWT.
+            navigate('/login');
+        } catch (error) {
+            if (error.response?.data?.errors) {
+                // Formatting standard ASP.NET Core Validation Errors
+                const errors = error.response.data.errors;
+                const formatted = Object.values(errors).flat().join(' ');
+                setErrorMsg(formatted);
+            } else {
+                setErrorMsg(error.response?.data?.error || 'Registration failed. Please try again later.');
+            }
+        } finally {
             setIsLoading(false);
-            console.log('Register attempt:', { role, ...formData });
-            // navigate('/dashboard');
-        }, 1200);
+        }
     };
 
     return (
@@ -47,20 +79,20 @@ export default function RegisterPage() {
 
                     <div className="role-tabs">
                         <div
-                            className={`role-tab ${role === 'student' ? 'active' : ''}`}
-                            onClick={() => setRole('student')}
+                            className={`role-tab ${role === 'Student' ? 'active' : ''}`}
+                            onClick={() => { setRole('Student'); setErrorMsg(''); }}
                         >
                             <GraduationCap size={16} /> Student
                         </div>
                         <div
-                            className={`role-tab ${role === 'company' ? 'active' : ''}`}
-                            onClick={() => setRole('company')}
+                            className={`role-tab ${role === 'Company' ? 'active' : ''}`}
+                            onClick={() => { setRole('Company'); setErrorMsg(''); }}
                         >
                             <Building2 size={16} /> Company
                         </div>
                         <div
-                            className={`role-tab ${role === 'admin' ? 'active' : ''}`}
-                            onClick={() => setRole('admin')}
+                            className={`role-tab ${role === 'Admin' ? 'active' : ''}`}
+                            onClick={() => { setRole('Admin'); setErrorMsg(''); }}
                         >
                             <ShieldCheck size={16} /> Admin
                         </div>
@@ -68,6 +100,12 @@ export default function RegisterPage() {
                 </div>
 
                 <form onSubmit={handleSubmit}>
+                    {errorMsg && (
+                        <div style={{ backgroundColor: '#fef2f2', color: 'var(--auth-error)', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <AlertCircle size={16} style={{ flexShrink: 0 }} /> {errorMsg}
+                        </div>
+                    )}
+
                     <div className="form-group">
                         <label className="form-label" htmlFor="fullName">Full Name</label>
                         <input
@@ -110,6 +148,7 @@ export default function RegisterPage() {
                                         onChange={handleChange}
                                         placeholder="••••••••"
                                         required
+                                        minLength={6}
                                     />
                                 </div>
                             </div>
@@ -148,7 +187,7 @@ export default function RegisterPage() {
                     </div>
 
                     {/* Dynamic Fields Section */}
-                    <div className={`dynamic-fields ${role === 'student' ? 'open' : ''}`}>
+                    <div className={`dynamic-fields ${role === 'Student' ? 'open' : ''}`}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
                             <div>
                                 <label className="form-label" htmlFor="universityId">Student ID</label>
@@ -180,7 +219,7 @@ export default function RegisterPage() {
                         </div>
                     </div>
 
-                    <div className={`dynamic-fields ${role === 'company' ? 'open' : ''}`}>
+                    <div className={`dynamic-fields ${role === 'Company' ? 'open' : ''}`}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
                             <div>
                                 <label className="form-label" htmlFor="companyName">Company Name</label>
@@ -212,7 +251,7 @@ export default function RegisterPage() {
                         </div>
                     </div>
 
-                    <div className={`dynamic-fields ${role === 'admin' ? 'open' : ''}`}>
+                    <div className={`dynamic-fields ${role === 'Admin' ? 'open' : ''}`}>
                         <div className="form-group" style={{ marginBottom: '24px' }}>
                             <label className="form-label" htmlFor="adminKey">Admin Verification Key</label>
                             <input
@@ -223,7 +262,7 @@ export default function RegisterPage() {
                                 placeholder="Enter university issued key"
                             />
                             <div className="form-error" style={{ color: 'var(--auth-text-sec)', marginTop: '4px', animation: 'none' }}>
-                                Required for elevated platform access.
+                                Registration locked. Contact IT.
                             </div>
                         </div>
                     </div>
@@ -231,7 +270,7 @@ export default function RegisterPage() {
                     <button
                         type="submit"
                         className="auth-btn"
-                        disabled={isLoading}
+                        disabled={isLoading || role === 'Admin'}
                     >
                         {isLoading ? <div className="spinner"></div> : "Create Account"}
                     </button>
