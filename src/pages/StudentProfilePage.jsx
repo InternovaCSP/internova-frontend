@@ -1,12 +1,17 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     User, GraduationCap, Book, Star, FileText,
-    CheckCircle, AlertCircle, ExternalLink, Upload
+    CheckCircle, AlertCircle, ExternalLink, Upload,
+    ArrowLeft, Loader2
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import apiClient from '../api/authApi';
 
 export default function StudentProfilePage() {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
     const [universityId, setUniversityId] = useState('');
     const [department, setDepartment] = useState('');
     const [gpa, setGpa] = useState('');
@@ -18,16 +23,16 @@ export default function StudentProfilePage() {
     const [resumeUrl, setResumeUrl] = useState('');
     const [isDragging, setIsDragging] = useState(false);
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0] ?? null;
-        handleFile(file);
-    };
+    function handleLogout() {
+        logout();
+        navigate('/login', { replace: true });
+    }
 
     const handleFile = (file) => {
         setErrorMessage('');
         if (!file) return;
         if (file.type !== 'application/pdf') {
-            setErrorMessage('Only PDF files are accepted. Please select a valid .pdf resume.');
+            setErrorMessage('Only PDF files are accepted.');
             setResumeFile(null);
             return;
         }
@@ -39,18 +44,16 @@ export default function StudentProfilePage() {
         setResumeFile(file);
     };
 
-    const handleDrop = (e) => {
-        e.preventDefault();
-        setIsDragging(false);
-        handleFile(e.dataTransfer.files[0] ?? null);
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage('');
         setSuccessMessage('');
         setResumeUrl('');
 
+        if (!universityId.trim()) {
+            setErrorMessage('University ID is required.');
+            return;
+        }
         if (!resumeFile) {
             setErrorMessage('Please select a PDF resume to upload.');
             return;
@@ -81,187 +84,167 @@ export default function StudentProfilePage() {
     };
 
     return (
-        <div className="profile-page">
-            {/* ── Left brand panel (re-uses auth system tokens) ── */}
-            <aside className="auth-panel-brand profile-brand-panel">
-                <div className="auth-brand-logo">
-                    <img src="/logo-mono-long.png" alt="InterNova" className="auth-logo-img" />
+        <div className="sp-shell">
+            {/* ── Top navbar ── */}
+            <nav className="sp-nav">
+                <div className="sp-nav-left">
+                    <img src="/logo-long.png" alt="Internova" style={{ height: '26px', objectFit: 'contain' }} />
                 </div>
-                <h1 className="auth-brand-heading">Build Your Professional Profile</h1>
-                <p className="auth-brand-desc">
-                    Complete your profile to unlock internship matching, project recommendations, and company visibility.
-                </p>
-                <ul className="auth-trust-list">
-                    <li><GraduationCap size={16} /><span>University-verified credentials</span></li>
-                    <li><Star size={16} /><span>AI-powered internship matching</span></li>
-                    <li><FileText size={16} /><span>Secure resume storage on Azure</span></li>
-                </ul>
-
-                <div style={{ marginTop: 'auto' }}>
-                    <Link to="/" className="auth-link" style={{ fontSize: '13px', opacity: 0.7 }}>
-                        ← Back to Home
+                <div className="sp-nav-right">
+                    <Link to="/student/dashboard" className="sp-nav-link">
+                        <ArrowLeft size={14} /> Dashboard
                     </Link>
+                    <button className="sp-nav-signout" onClick={handleLogout}>Sign Out</button>
                 </div>
-            </aside>
+            </nav>
 
-            {/* ── Right form panel ── */}
-            <main className="auth-panel-form">
-                <div className="auth-card profile-card">
-                    <div className="auth-card-header">
-                        <h2 className="auth-card-title">
-                            <User size={20} style={{ color: 'var(--auth-teal)', marginRight: '8px' }} />
-                            Student Profile
-                        </h2>
-                        <p className="auth-card-sub">
-                            Fill in your academic details and upload your resume PDF.
-                        </p>
+            {/* ── Page body ── */}
+            <div className="sp-body">
+
+                {/* Page header */}
+                <div className="sp-page-header">
+                    <div className="sp-page-header-icon">
+                        <User size={22} />
+                    </div>
+                    <div>
+                        <h1 className="sp-page-title">My Profile</h1>
+                        <p className="sp-page-sub">Update your academic details and upload your latest resume.</p>
+                    </div>
+                </div>
+
+                {/* Main form card */}
+                <form onSubmit={handleSubmit} noValidate className="sp-card">
+
+                    {/* Section: Academic Info */}
+                    <div className="sp-section-label">Academic Information</div>
+
+                    <div className="sp-field-row">
+                        <div className="sp-field">
+                            <label className="sp-label" htmlFor="universityId">
+                                <GraduationCap size={13} /> University ID <span className="sp-required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="universityId"
+                                className="sp-input"
+                                placeholder="e.g. CS2021001"
+                                value={universityId}
+                                onChange={e => setUniversityId(e.target.value)}
+                            />
+                        </div>
+                        <div className="sp-field">
+                            <label className="sp-label" htmlFor="department">
+                                <Book size={13} /> Department
+                            </label>
+                            <input
+                                type="text"
+                                id="department"
+                                className="sp-input"
+                                placeholder="e.g. Computer Science"
+                                value={department}
+                                onChange={e => setDepartment(e.target.value)}
+                            />
+                        </div>
                     </div>
 
-                    <form onSubmit={handleSubmit} noValidate>
-
-                        {/* ── Error banner ── */}
-                        {errorMessage && (
-                            <div className="profile-alert profile-alert--error">
-                                <AlertCircle size={16} />
-                                <span>{errorMessage}</span>
-                            </div>
-                        )}
-
-                        {/* ── Success banner ── */}
-                        {successMessage && (
-                            <div className="profile-alert profile-alert--success">
-                                <CheckCircle size={16} />
-                                <span>{successMessage}</span>
-                            </div>
-                        )}
-
-                        {/* Resume URL result */}
-                        {resumeUrl && (
-                            <div className="profile-resume-link">
-                                <FileText size={14} />
-                                <span>Resume Link:</span>
-                                <a href={resumeUrl} target="_blank" rel="noreferrer" className="auth-link auth-link--teal">
-                                    View uploaded resume <ExternalLink size={12} style={{ display: 'inline' }} />
-                                </a>
-                            </div>
-                        )}
-
-                        {/* ── University ID + Department ── */}
-                        <div className="profile-row">
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="universityId">
-                                    <GraduationCap size={13} /> University ID <span className="profile-required">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="universityId"
-                                    className="auth-input"
-                                    placeholder="e.g. CS2021001"
-                                    value={universityId}
-                                    onChange={e => setUniversityId(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="department">
-                                    <Book size={13} /> Department
-                                </label>
-                                <input
-                                    type="text"
-                                    id="department"
-                                    className="auth-input"
-                                    placeholder="e.g. Computer Science"
-                                    value={department}
-                                    onChange={e => setDepartment(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        {/* ── GPA ── */}
-                        <div className="form-group">
-                            <label className="form-label" htmlFor="gpa">
+                    <div className="sp-field-row">
+                        <div className="sp-field">
+                            <label className="sp-label" htmlFor="gpa">
                                 <Star size={13} /> GPA (0.00 – 4.00)
                             </label>
                             <input
                                 type="number"
                                 id="gpa"
-                                className="auth-input"
+                                className="sp-input"
                                 placeholder="e.g. 3.75"
-                                min="0"
-                                max="4"
-                                step="0.01"
+                                min="0" max="4" step="0.01"
                                 value={gpa}
                                 onChange={e => setGpa(e.target.value)}
                             />
                         </div>
-
-                        {/* ── Skills ── */}
-                        <div className="form-group">
-                            <label className="form-label" htmlFor="skills">
+                        <div className="sp-field sp-field--full">
+                            <label className="sp-label" htmlFor="skills">
                                 Skills
                             </label>
-                            <textarea
+                            <input
+                                type="text"
                                 id="skills"
-                                className="auth-input profile-textarea"
-                                placeholder="e.g. React, C#, Azure, Node.js, SQL"
+                                className="sp-input"
+                                placeholder="e.g. React, C#, Azure, SQL"
                                 value={skills}
-                                rows={3}
                                 onChange={e => setSkills(e.target.value)}
                             />
                         </div>
+                    </div>
 
-                        {/* ── Resume drop zone ── */}
-                        <div className="form-group">
-                            <label className="form-label" htmlFor="resume">
-                                <FileText size={13} /> Resume (PDF only, max 5 MB) <span className="profile-required">*</span>
-                            </label>
-                            <div
-                                className={`profile-dropzone ${isDragging ? 'dragging' : ''} ${resumeFile ? 'selected' : ''}`}
-                                onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
-                                onDragLeave={() => setIsDragging(false)}
-                                onDrop={handleDrop}
-                                onClick={() => document.getElementById('resume').click()}
-                            >
-                                <Upload size={24} className="profile-dropzone-icon" />
-                                {resumeFile ? (
-                                    <div>
-                                        <p className="profile-dropzone-filename">{resumeFile.name}</p>
-                                        <p className="profile-dropzone-hint">
-                                            {(resumeFile.size / 1024).toFixed(0)} KB · Click to change
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <p className="profile-dropzone-label">Drag & drop your resume here</p>
-                                        <p className="profile-dropzone-hint">or click to browse · PDF only</p>
-                                    </div>
-                                )}
-                            </div>
-                            <input
-                                type="file"
-                                id="resume"
-                                accept="application/pdf,.pdf"
-                                style={{ display: 'none' }}
-                                onChange={handleFileChange}
-                            />
+                    {/* Section: Resume Upload */}
+                    <div className="sp-section-label" style={{ marginTop: '28px' }}>Resume</div>
+
+                    <div
+                        className={`sp-dropzone ${isDragging ? 'sp-dropzone--active' : ''} ${resumeFile ? 'sp-dropzone--selected' : ''}`}
+                        onClick={() => document.getElementById('sp-resume-input').click()}
+                        onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={e => { e.preventDefault(); setIsDragging(false); handleFile(e.dataTransfer.files[0] ?? null); }}
+                    >
+                        {resumeFile ? (
+                            <>
+                                <div className="sp-dropzone-icon sp-dropzone-icon--selected">
+                                    <FileText size={28} />
+                                </div>
+                                <p className="sp-dropzone-filename">{resumeFile.name}</p>
+                                <p className="sp-dropzone-hint">{(resumeFile.size / 1024).toFixed(0)} KB · Click to change file</p>
+                            </>
+                        ) : (
+                            <>
+                                <div className="sp-dropzone-icon">
+                                    <Upload size={28} />
+                                </div>
+                                <p className="sp-dropzone-title">Drop your resume here or <span className="sp-dropzone-browse">click to browse</span></p>
+                                <p className="sp-dropzone-hint">PDF only · Maximum 5 MB</p>
+                            </>
+                        )}
+                    </div>
+                    <input
+                        type="file"
+                        id="sp-resume-input"
+                        accept="application/pdf,.pdf"
+                        style={{ display: 'none' }}
+                        onChange={e => handleFile(e.target.files[0] ?? null)}
+                    />
+
+                    {/* Alerts */}
+                    {errorMessage && (
+                        <div className="sp-alert sp-alert--error">
+                            <AlertCircle size={15} /> <span>{errorMessage}</span>
                         </div>
+                    )}
+                    {successMessage && (
+                        <div className="sp-alert sp-alert--success">
+                            <CheckCircle size={15} /> <span>{successMessage}</span>
+                        </div>
+                    )}
+                    {resumeUrl && (
+                        <div className="sp-resume-link">
+                            <FileText size={14} />
+                            <span>Uploaded resume:</span>
+                            <a href={resumeUrl} target="_blank" rel="noreferrer" className="sp-resume-anchor">
+                                View PDF <ExternalLink size={11} style={{ display: 'inline', verticalAlign: 'middle' }} />
+                            </a>
+                        </div>
+                    )}
 
-                        {/* ── Submit ── */}
-                        <button
-                            type="submit"
-                            className="auth-btn"
-                            disabled={loading}
-                        >
+                    {/* Submit */}
+                    <div className="sp-actions">
+                        <button type="submit" className="sp-btn-primary" disabled={loading}>
                             {loading ? (
-                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                                    <div className="spinner" />
-                                    Uploading...
-                                </span>
+                                <><Loader2 size={16} className="sp-spinner" /> Uploading…</>
                             ) : 'Save Profile'}
                         </button>
-                    </form>
-                </div>
-            </main>
+                    </div>
+
+                </form>
+            </div>
         </div>
     );
 }
