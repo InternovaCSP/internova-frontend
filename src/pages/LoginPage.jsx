@@ -28,9 +28,9 @@ export default function LoginPage() {
             const data = await login(formData.email, formData.password);
             // Save JWT from AuthResponse DTO
             localStorage.setItem('internova_token', data.token);
-            // Decode or store user meta if needed: data.userId, data.email, data.role
-            // Route back to home page or specific portal
-            navigate('/');
+            // Route to the correct dashboard based on role
+            const roleRoutes = { Student: '/student/dashboard', Company: '/company/dashboard', Admin: '/admin/dashboard' };
+            navigate(roleRoutes[data.role] ?? '/');
         } catch (error) {
             setErrorMsg(error.response?.data?.error || 'Failed to connect to the server.');
         } finally {

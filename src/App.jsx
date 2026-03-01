@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
@@ -6,12 +6,13 @@ import RegisterPage from './pages/RegisterPage'
 import StudentDashboard from './pages/StudentDashboard'
 import CompanyDashboard from './pages/CompanyDashboard'
 import AdminDashboard from './pages/AdminDashboard'
+import StudentProfilePage from './pages/StudentProfilePage'
 import NotFound from './pages/NotFound'
 
 function App() {
     return (
         <Routes>
-            {/* Public — root shows the landing page */}
+            {/* Public */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -22,6 +23,14 @@ function App() {
                 element={
                     <ProtectedRoute allowedRoles={['Student']}>
                         <StudentDashboard />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/student/profile"
+                element={
+                    <ProtectedRoute allowedRoles={['Student']}>
+                        <StudentProfilePage />
                     </ProtectedRoute>
                 }
             />
