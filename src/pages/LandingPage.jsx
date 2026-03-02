@@ -34,8 +34,8 @@ export default function LandingPage() {
                     </Link>
                     <div className="lp-nav-links">
                         <Link to="/internships" className="lp-nav-link">Internships</Link>
-                        <a href="#projects" className="lp-nav-link">Projects</a>
-                        <a href="#competitions" className="lp-nav-link">Competitions</a>
+                        <Link to="/projects" className="lp-nav-link">Projects</Link>
+                        <Link to="/competitions" className="lp-nav-link">Competitions</Link>
                     </div>
                     <div className="lp-nav-actions">
                         <Link to="/login" className="lp-btn lp-btn--outline">Login</Link>
@@ -434,8 +434,8 @@ export default function LandingPage() {
                         <div className="lp-footer-col">
                             <div className="lp-footer-col-title">Product</div>
                             <Link to="/internships" className="lp-footer-link">Internships</Link>
-                            <a href="#" className="lp-footer-link">Projects</a>
-                            <a href="#" className="lp-footer-link">Competitions</a>
+                            <Link to="/projects" className="lp-footer-link">Projects</Link>
+                            <Link to="/competitions" className="lp-footer-link">Competitions</Link>
                         </div>
                         <div className="lp-footer-col">
                             <div className="lp-footer-col-title">Company</div>

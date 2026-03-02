@@ -9,6 +9,8 @@ import AdminDashboard from './pages/AdminDashboard'
 import StudentProfilePage from './pages/StudentProfilePage'
 import NotFound from './pages/NotFound'
 import InternshipsPage from './pages/InternshipsPage'
+import ProjectsPage from './pages/ProjectsPage'
+import CompetitionsPage from './pages/CompetitionsPage'
 
 function App() {
     return (
@@ -16,6 +18,8 @@ function App() {
             {/* Public */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/internships" element={<InternshipsPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/competitions" element={<CompetitionsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 

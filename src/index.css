@@ -2805,6 +2805,99 @@ body {
   }
 }
 
+/* ── E) PROJECTS PAGE FIXES ── */
+.in-filters-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 1px solid var(--in-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  margin-bottom: 24px;
+}
+
+.in-search-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.in-search-input {
+  width: 100%;
+  padding: 10px 16px 10px 42px;
+  border: 1px solid var(--in-border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--in-text-primary);
+  background: var(--in-bg-light);
+  transition: var(--in-transition-smooth);
+}
+
+.in-search-input:focus {
+  outline: none;
+  border-color: var(--in-azure);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+}
+
+.in-search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--in-text-muted);
+}
+
+.in-filters-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .in-filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .in-filters-group {
+    flex-wrap: wrap;
+  }
+
+  .in-select-wrap {
+    flex: 1;
+    min-width: 140px;
+  }
+}
+
+.in-card-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.in-skill-tag {
+  background: var(--in-bg-light);
+  color: var(--in-text-secondary);
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--in-border);
+  white-space: nowrap;
+}
+
+.in-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
 /* ═══════════════════════════════════════════════════════
    PREMIUM SAAS INTERNSHIPS PAGE (in-)
 ═══════════════════════════════════════════════════════ */

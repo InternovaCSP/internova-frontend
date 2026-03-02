@@ -94,8 +94,8 @@ const InternshipsPage = () => {
                     </Link>
                     <div className="lp-nav-links">
                         <Link to="/internships" className="lp-nav-link">Internships</Link>
-                        <a href="/#projects" className="lp-nav-link">Projects</a>
-                        <a href="/#competitions" className="lp-nav-link">Competitions</a>
+                        <Link to="/projects" className="lp-nav-link">Projects</Link>
+                        <Link to="/competitions" className="lp-nav-link">Competitions</Link>
                     </div>
                     <div className="lp-nav-actions">
                         {user ? (
