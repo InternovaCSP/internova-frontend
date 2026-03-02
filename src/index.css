@@ -746,8 +746,10 @@ body {
   /* Strictly Enforced Brand Identity */
   --lp-navy: #0D1B2A;
   --lp-blue: #0078D4;
+  --lp-azure: #0078D4;
   --lp-teal: #1D8954;
   --lp-gray: #E9EEF5;
+  --lp-slate: #F4F6F9;
   /* New Slate Gray light background */
   --lp-gold: #F9A825;
 
@@ -4535,5 +4537,285 @@ body {
 
   .in-navbar-container {
     padding: 0 16px;
+  }
+}
+
+/* ========================================================== */
+/* STUDENT DASHBOARD V2 (NO SIDEBAR, GRID LAYOUT) */
+/* ========================================================== */
+
+/* Container and Layout Setup */
+.dash-v2-layout {
+  min-height: 100vh;
+  background-color: #F4F6F9;
+  /* Light Slate (#F4F6F9) */
+  padding: 40px 24px;
+}
+
+.dash-v2-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  /* 8px system: spacing between major sections */
+}
+
+/* V2 Reusable Card */
+.dash-v2-card {
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(13, 27, 42, 0.05);
+  /* Soft, subtle deep navy shadow */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  border: none;
+}
+
+/* Hover Lift Effect */
+.dash-v2-card-interactive {
+  cursor: pointer;
+}
+
+.dash-v2-card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(13, 27, 42, 0.08);
+}
+
+/* Section Headings */
+.dash-v2-section-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--lp-navy);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Welcome Row */
+.dash-v2-welcome-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.dash-v2-welcome-text h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+  color: var(--lp-navy);
+  margin-bottom: 8px;
+}
+
+.dash-v2-welcome-text p {
+  color: #64748b;
+  /* Muted slate */
+  font-size: 16px;
+}
+
+/* KPI Overviews (4 Cards) */
+.dash-v2-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.dash-v2-kpi-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+}
+
+.dash-v2-kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.dash-v2-kpi-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dash-v2-kpi-icon-azure {
+  background-color: rgba(0, 120, 212, 0.1);
+  color: var(--lp-azure);
+}
+
+.dash-v2-kpi-icon-teal {
+  background-color: rgba(29, 137, 84, 0.1);
+  color: var(--lp-teal);
+}
+
+.dash-v2-kpi-trend {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.dash-v2-kpi-trend-positive {
+  background-color: rgba(29, 137, 84, 0.1);
+  color: var(--lp-teal);
+}
+
+.dash-v2-kpi-trend-active {
+  background-color: rgba(0, 120, 212, 0.1);
+  color: var(--lp-azure);
+}
+
+.dash-v2-kpi-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--lp-navy);
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1;
+  margin-bottom: 8px;
+  margin-top: 20px;
+}
+
+.dash-v2-kpi-label {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* 65 / 35 Split Analytics Row */
+.dash-v2-analytics-row {
+  display: grid;
+  grid-template-columns: 6.5fr 3.5fr;
+  gap: 24px;
+}
+
+/* 50 / 50 Split Activity Row */
+.dash-v2-activity-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* Pipeline Specifics */
+.dash-v2-pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  position: relative;
+  margin-top: 16px;
+  padding-bottom: 8px;
+}
+
+.dash-v2-pipeline-card {
+  text-align: center;
+  padding: 16px 12px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.dash-v2-pipeline-card.active {
+  border-color: var(--lp-azure);
+  background-color: #ffffff;
+}
+
+.dash-v2-pipeline-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+/* Colors for Pipeline */
+.badge-azure {
+  background: var(--lp-azure);
+  color: #fff;
+}
+
+.badge-teal {
+  background: var(--lp-teal);
+  color: #fff;
+}
+
+.badge-gold {
+  background: var(--lp-gold);
+  color: #fff;
+}
+
+.badge-red {
+  background: #ef4444;
+  color: #fff;
+}
+
+.dash-v2-pipeline-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lp-navy);
+}
+
+/* Upcoming Interviews List */
+.dash-v2-interview-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.dash-v2-interview-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dash-v2-company {
+  font-weight: 600;
+  color: var(--lp-navy);
+  margin-bottom: 4px;
+}
+
+.dash-v2-interview-meta {
+  font-size: 13px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dash-v2-link {
+  color: var(--lp-azure);
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.dash-v2-link:hover {
+  text-decoration: underline;
+}
+
+/* Mobile Responsiveness */
+@media screen and (max-width: 1024px) {
+
+  .dash-v2-kpi-grid,
+  .dash-v2-analytics-row,
+  .dash-v2-activity-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .dash-v2-pipeline-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
