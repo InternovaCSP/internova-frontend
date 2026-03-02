@@ -1,98 +1,114 @@
-import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { User, BookOpen, Briefcase, Award } from 'lucide-react'
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
+// Import New Dashboard Components
+import StudentSidebar from '../components/StudentSidebar';
+import DashboardTopNav from '../components/DashboardTopNav';
+import StatsCard from '../components/StatsCard';
+import ApplicationPipeline from '../components/ApplicationPipeline';
+import ActivityFeed from '../components/ActivityFeed';
+import RecommendationCard from '../components/RecommendationCard';
+import DocumentStatusCard from '../components/DocumentStatusCard';
 
 export default function StudentDashboard() {
-    const { user, logout } = useAuth()
-    const navigate = useNavigate()
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        // Simulate loading state to show skeletons/fade-in
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 800);
+        return () => clearTimeout(timer);
+    }, []);
 
     function handleLogout() {
-        logout()
-        navigate('/login', { replace: true })
+        logout();
+        navigate('/login', { replace: true });
     }
 
+    const recs = [
+        { id: 1, title: 'Summer Software Engineering Intern', desc: 'TechCorp is looking for React developers.', link: '#' },
+        { id: 2, title: 'AI Research Assistant', desc: 'Join the university Lab for Quantum AI.', link: '#' },
+        { id: 3, title: 'Hackathon 2026', desc: 'Compete with 500+ students globally.', link: '#' }
+    ];
+
     return (
-        <div className="dashboard">
-            <nav className="dashboard-nav">
-                <img src="/logo-long.png" alt="Internova" className="brand" style={{ height: '28px', objectFit: 'contain' }} />
-                <button className="btn btn-ghost" style={{ width: 'auto', padding: '.45rem 1rem' }} onClick={handleLogout}>
-                    Sign Out
-                </button>
-            </nav>
+        <div className="dash-layout">
+            <StudentSidebar onLogout={handleLogout} />
 
-            <div className="dashboard-body">
-                <span className="role-badge">Student</span>
-                <h1 className="dashboard-title">Student Dashboard</h1>
-                <p className="dashboard-meta">
-                    Welcome, <strong>{user?.email}</strong>
-                </p>
-                <p className="dashboard-meta" style={{ color: 'var(--muted)', fontSize: '.82rem', marginBottom: '2rem' }}>
-                    Manage your profile, find internships, and track your applications.
-                </p>
+            <div className="dash-main">
+                <DashboardTopNav />
 
-                {/* Quick action cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', maxWidth: '800px' }}>
-                    {/* Profile card */}
-                    <Link to="/student/profile" style={{ textDecoration: 'none' }}>
-                        <div style={{
-                            background: 'var(--surface)',
-                            border: '1px solid var(--border)',
-                            borderRadius: 'var(--radius)',
-                            padding: '1.5rem',
-                            cursor: 'pointer',
-                            transition: 'border-color 0.2s, transform 0.2s',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '0.75rem',
-                        }}
-                            onMouseEnter={e => e.currentTarget.style.borderColor = '#0078D4'}
-                            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
-                        >
-                            <User size={28} color="#0078D4" />
-                            <div>
-                                <p style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>My Profile</p>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>Add your university details & upload your resume</p>
+                <div className="dash-content">
+                    {/* Welcome Header */}
+                    <div className="dash-header">
+                        <h1 className="dash-title">Welcome back, {user?.email?.split('@')[0] || 'Student'}</h1>
+                        <p className="dash-subtitle">
+                            Track your internship applications, project participation, and competition activities in one place.
+                        </p>
+                    </div>
+
+                    {isLoading ? (
+                        <div className="dash-skeleton-grid">
+                            {/* Stats Skeletons */}
+                            <div className="dash-stats-row">
+                                {[1, 2, 3, 4].map(n => <div key={n} className="in-skeleton dash-stat-card"></div>)}
+                            </div>
+                            {/* Main Body Skeleton */}
+                            <div className="dash-grid-primary">
+                                <div className="dash-col-left">
+                                    <div className="in-skeleton dash-card" style={{ height: '200px' }}></div>
+                                    <div className="in-skeleton dash-card" style={{ height: '300px' }}></div>
+                                </div>
+                                <div className="dash-col-right">
+                                    <div className="in-skeleton dash-card" style={{ height: '150px' }}></div>
+                                    <div className="in-skeleton dash-card" style={{ height: '300px' }}></div>
+                                </div>
                             </div>
                         </div>
-                    </Link>
+                    ) : (
+                        <div className="dash-fade-in">
+                            {/* Key Stats Row */}
+                            <div className="dash-stats-row">
+                                <StatsCard title="Applications Submitted" count="12" iconName="Briefcase" trend="+2 this week" />
+                                <StatsCard title="Interviews Scheduled" count="1" iconName="Calendar" />
+                                <StatsCard title="Projects Joined" count="3" iconName="BookOpen" />
+                                <StatsCard title="Competitions Registered" count="2" iconName="Trophy" trend="1 active" />
+                            </div>
 
-                    {/* Internships card (coming soon) */}
-                    <div style={{
-                        background: 'var(--surface)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--radius)',
-                        padding: '1.5rem',
-                        opacity: 0.5,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '0.75rem',
-                    }}>
-                        <Briefcase size={28} color="#1D8954" />
-                        <div>
-                            <p style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>Internships</p>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>Browse & apply for internships — coming soon</p>
-                        </div>
-                    </div>
+                            {/* Main Content Grid */}
+                            <div className="dash-grid-primary">
+                                {/* Left Column: 2/3 width */}
+                                <div className="dash-col-left">
+                                    <ApplicationPipeline />
 
-                    {/* Projects card (coming soon) */}
-                    <div style={{
-                        background: 'var(--surface)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--radius)',
-                        padding: '1.5rem',
-                        opacity: 0.5,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '0.75rem',
-                    }}>
-                        <BookOpen size={28} color="#F9A825" />
-                        <div>
-                            <p style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>Projects</p>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>University projects & competitions — coming soon</p>
+                                    <div className="dash-card">
+                                        <h3 className="dash-section-title">Recommended for You</h3>
+                                        <div className="dash-rec-grid">
+                                            {recs.map(rec => (
+                                                <RecommendationCard key={rec.id} title={rec.title} description={rec.desc} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Right Column: 1/3 width */}
+                                <div className="dash-col-right">
+                                    <ActivityFeed />
+                                    <DocumentStatusCard />
+                                </div>
+                            </div>
+
+                            <div className="dash-security-note">
+                                <p>Your data is securely encrypted and role-protected.</p>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>
-    )
+    );
 }
