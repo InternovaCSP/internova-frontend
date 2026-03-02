@@ -13,6 +13,17 @@ import InternshipsPage from './pages/InternshipsPage'
 import ProjectsPage from './pages/ProjectsPage'
 import CompetitionsPage from './pages/CompetitionsPage'
 
+/**
+ * App Component
+ * 
+ * Serves as the primary routing configuration for the InterNova frontend.
+ * Defines both public routes (accessible to anyone) and protected routes
+ * (gated by specific user roles like Student, Company, or Admin).
+ * The universal TopNavbar is rendered securely outside the Routes wrapper
+ * so it remains sticky across all page transitions.
+ *
+ * @returns {JSX.Element} The rendered React Router tree.
+ */
 function App() {
     return (
         <>

@@ -6,6 +6,15 @@ import ProjectsFilterBar from '../components/ProjectsFilterBar';
 import ProjectCard from '../components/ProjectCard';
 import { mockProjects } from '../data/mockProjects';
 
+/**
+ * ProjectsPage Component
+ * 
+ * The directory page designed for viewing and joining collaborative University Projects.
+ * Incorporates a customized `ProjectsFilterBar` to filter by active domain and 
+ * visualizes opportunities using `ProjectCard` components.
+ * 
+ * @returns {JSX.Element} The main projects browsing interface.
+ */
 export default function ProjectsPage() {
     const { user } = useAuth();
 

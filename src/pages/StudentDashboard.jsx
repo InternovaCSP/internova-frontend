@@ -6,6 +6,16 @@ import KpiCardGrid from '../components/dashboard-v2/KpiCardGrid';
 import AnalyticsRow from '../components/dashboard-v2/AnalyticsRow';
 import ActivityAndRecsRow from '../components/dashboard-v2/ActivityAndRecsRow';
 
+/**
+ * StudentDashboard Component (V2)
+ * 
+ * The primary authenticated view for Student users.
+ * Composes the Dashboard V2 layout using modular rows (Welcome, KPI Grid, Analytics, and Activity).
+ * Implements a brief artificial loading delay on mount to demonstrate skeleton loaders
+ * and simulate fetching complex dashboard metrics.
+ * 
+ * @returns {JSX.Element} The composed dashboard grid layout.
+ */
 export default function StudentDashboard() {
     const [isLoading, setIsLoading] = useState(true);
 

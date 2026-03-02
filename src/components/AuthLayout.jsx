@@ -1,6 +1,17 @@
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Server, Lock } from 'lucide-react';
 
+/**
+ * AuthLayout Component
+ * 
+ * A structured split-screen wrapper used for authentication pages (Login/Register).
+ * Displays a branded promotional panel on the left (or top on mobile) and 
+ * wraps the active authentication form on the right.
+ * 
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - The specific authentication form to render.
+ * @returns {JSX.Element} The split-view authentication layout.
+ */
 export default function AuthLayout({ children }) {
     return (
         <div className="auth-layout">

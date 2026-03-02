@@ -7,6 +7,16 @@ import {
     X, AlertCircle, ArrowLeft, Loader2
 } from 'lucide-react';
 
+/**
+ * StudentProfilePage Component
+ * 
+ * An interactive, two-column layout allowing students to view and edit their 
+ * profile details and upload a PDF resume. 
+ * Communicates with the C# backend via `apiClient.put` utilizing an 
+ * `application/x-www-form-urlencoded` format (with appended files).
+ * 
+ * @returns {JSX.Element} The complex profile viewer and editor interface.
+ */
 export default function StudentProfilePage() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();

@@ -2,6 +2,14 @@ import React from 'react';
 import { Bell, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+/**
+ * DashboardTopNav Component (Legacy)
+ * 
+ * Represents the top navigation strip inside V1 dashboard layouts.
+ * Features profile completion status and a localized notification bell.
+ * 
+ * @returns {JSX.Element} The legacy dashboard header.
+ */
 export default function DashboardTopNav() {
     const { user } = useAuth();
 

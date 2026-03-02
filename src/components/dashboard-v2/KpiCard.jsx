@@ -1,6 +1,19 @@
 import React from 'react';
 import * as LucideIcons from 'lucide-react';
 
+/**
+ * KpiCard Component
+ * 
+ * A reusable individual metric card intended for the top of the dashboard.
+ * 
+ * @param {Object} props
+ * @param {string} props.title - The title of the metric (e.g., "Applications Submitted").
+ * @param {string|number} props.count - The primary numerical value describing the metric.
+ * @param {string} props.iconName - The string name matching a valid Lucide-react icon component.
+ * @param {string} [props.trend] - Positive or negative text indicator (e.g., "+2 this week").
+ * @param {string} [props.iconVariant='azure'] - Dictates the CSS color mapping of the icon badge.
+ * @returns {JSX.Element} The individual styled metric box.
+ */
 export default function KpiCard({ title, count, iconName, trend, iconVariant = 'azure' }) {
     // Dynamically get the Lucide icon based on string name
     const IconComponent = LucideIcons[iconName];

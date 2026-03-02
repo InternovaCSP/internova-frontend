@@ -4,6 +4,15 @@ import { Eye, EyeOff, Building2, GraduationCap, ShieldCheck, AlertCircle } from 
 import AuthLayout from '../components/AuthLayout';
 import { register } from '../api/authApi';
 
+/**
+ * RegisterPage Component
+ * 
+ * Provides the user registration flow for Students, Companies, and Admins.
+ * Contains dynamic form fields governed by a role selection tab group.
+ * Validates password matching and handles backend ASP.NET validation error formatting.
+ * 
+ * @returns {JSX.Element} The registration form wrapped in the AuthLayout.
+ */
 export default function RegisterPage() {
     const navigate = useNavigate();
     const [role, setRole] = useState('Student');

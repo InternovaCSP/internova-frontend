@@ -4,6 +4,16 @@ import { Eye, EyeOff, Lock, AlertCircle } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
 import { useAuth } from '../context/AuthContext';
 
+/**
+ * LoginPage Component
+ * 
+ * Handles user authentication against the backend API.
+ * Uses the global AuthContext to invoke login logic and store the resulting JWT.
+ * Features inline validation, loading states, and secure password visibility toggles.
+ * Automatically routes users to their respective dashboards upon successful login.
+ * 
+ * @returns {JSX.Element} The login form wrapped in the AuthLayout.
+ */
 export default function LoginPage() {
     const navigate = useNavigate();
     const { login, user } = useAuth();

@@ -1,6 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 
+/**
+ * NotificationBell Component
+ * 
+ * A clickable bell icon that opens a dropdown containing user-specific alerts
+ * (e.g. application updates, reminders). Unread badge count conditionally renders.
+ * Closes automatically when clicking outside the dropdown container.
+ * 
+ * @returns {JSX.Element} The notification bell trigger and dropdown popover.
+ */
 export default function NotificationBell() {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);

@@ -1,6 +1,15 @@
 import React from 'react';
 import { Calendar, Monitor, Building } from 'lucide-react';
 
+/**
+ * InterviewsCard Component
+ * 
+ * Highlights the student's upcoming scheduled interviews.
+ * Maps data directly to list items, indicating company names, dates,
+ * and whether the interview is Online (Monitor icon) or Onsite (Building icon).
+ * 
+ * @returns {JSX.Element} The upcoming interviews schedule widget.
+ */
 export default function InterviewsCard() {
     const interviews = [
         { id: 1, company: 'Microsoft', date: 'Oct 24, 10:00 AM', mode: 'Online', icon: Monitor },

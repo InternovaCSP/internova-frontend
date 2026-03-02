@@ -1,6 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+/**
+ * AdminDashboard Component
+ * 
+ * The protected dashboard interface specifically for Administrative users.
+ * Currently serves as a specialized layout shell for moderating the platform,
+ * managing university-partner relationships, and overseeing standard users.
+ * 
+ * @returns {JSX.Element} The admin dashboard layout.
+ */
 export default function AdminDashboard() {
     const { user, logout } = useAuth()
     const navigate = useNavigate()

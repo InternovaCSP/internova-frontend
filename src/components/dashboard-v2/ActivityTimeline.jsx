@@ -1,5 +1,14 @@
 import React from 'react';
 
+/**
+ * ActivityTimeline Component
+ * 
+ * Renders a vertically styled chronological timeline of recent user activities,
+ * such as application submissions, profile updates, and interview schedules.
+ * Utilizes static color-coding connected to a vertical CSS line.
+ * 
+ * @returns {JSX.Element} The visual timeline widget.
+ */
 export default function ActivityTimeline() {
     const activities = [
         { id: 1, title: 'Application Submitted', desc: 'Applied for Cloud Intern at Microsoft.', time: '2 hours ago', color: 'azure' },

@@ -1,6 +1,14 @@
 import React from 'react';
 import KpiCard from './KpiCard';
 
+/**
+ * KpiCardGrid Component
+ * 
+ * A responsive 4-column CSS grid that renders individual `KpiCard` elements.
+ * Summarizes the user's top-level metrics: Applications, Interviews, Projects, and Competitions.
+ * 
+ * @returns {JSX.Element} The container grid with injected KPI cards.
+ */
 export default function KpiCardGrid() {
     return (
         <div className="dash-v2-kpi-grid">

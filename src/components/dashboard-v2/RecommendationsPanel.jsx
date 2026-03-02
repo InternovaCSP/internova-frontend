@@ -1,6 +1,15 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 
+/**
+ * RecommendationsPanel Component
+ * 
+ * Evaluates the user's profile to suggest personalized opportunities
+ * across Internships, Projects, and Competitions. Displays a scrollable stack
+ * of suggestion cards utilizing the InterNova style language.
+ * 
+ * @returns {JSX.Element} The recommendation sidebar panel.
+ */
 export default function RecommendationsPanel() {
     const recommendations = [
         {

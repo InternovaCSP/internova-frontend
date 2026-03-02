@@ -6,6 +6,16 @@ import {
     Menu, Check, Star
 } from 'lucide-react';
 
+/**
+ * LandingPage Component
+ * 
+ * The primary public-facing 'Home' index page of the application.
+ * Highlights the value proposition of InterNova for Students, Companies, and Universities.
+ * Includes dynamic scroll-tracking for a sticky transparent-to-solid navbar effect
+ * and tabbed interfaces for viewing different role-based features.
+ * 
+ * @returns {JSX.Element} The promotional landing page layout.
+ */
 export default function LandingPage() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [activeTab, setActiveTab] = useState('student');

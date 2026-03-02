@@ -5,6 +5,19 @@ import NavLinks from './NavLinks';
 import AuthButtons from './AuthButtons';
 import { X } from 'lucide-react';
 
+/**
+ * MobileDrawer Component
+ * 
+ * A sliding side-drawer designed for mobile navigation. Maps identical routing 
+ * options from the TopNavbar into a touch-friendly vertical list.
+ * Automatically locks the background body scroll while the drawer is open.
+ * 
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Controls visibility of the drawer.
+ * @param {Function} props.onClose - Callback triggered to close the drawer.
+ * @param {Object} props.user - Authenticated user context.
+ * @returns {JSX.Element} The side navigation overlay.
+ */
 export default function MobileDrawer({ isOpen, onClose, user }) {
     const { logout } = useAuth();
     const navigate = useNavigate();

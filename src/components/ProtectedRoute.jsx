@@ -8,16 +8,20 @@ const ROLE_DASHBOARDS = {
 }
 
 /**
- * ProtectedRoute
+ * ProtectedRoute Component
+ * 
+ * A higher-order wrapper component that restricts access to role-gated routes.
+ * 
+ * Behavior:
+ * - If no authentication token or user exists, redirects to `/login`.
+ * - If the authenticated user's role is not included in the `allowedRoles` array, 
+ *   redirects them to their appropriate specific role Dashboard based on ROLE_DASHBOARDS map.
+ * - Otherwise, correctly renders the requested child component.
  *
- * Usage:
- *   <ProtectedRoute allowedRoles={['Student']}>
- *     <StudentDashboard />
- *   </ProtectedRoute>
- *
- * - No token → redirect to /login
- * - Token present but wrong role → redirect to the user's correct dashboard
- * - Role matches (or no allowedRoles restriction) → render children
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - The protected page component to render.
+ * @param {string[]} props.allowedRoles - Array of roles permitted to view this route (e.g., ['Student', 'Admin']).
+ * @returns {JSX.Element} The children or a Navigate redirection element.
  */
 export default function ProtectedRoute({ children, allowedRoles }) {
     const { token, user } = useAuth()

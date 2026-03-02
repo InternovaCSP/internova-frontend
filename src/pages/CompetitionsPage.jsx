@@ -6,6 +6,15 @@ import CompetitionsFilterBar from '../components/CompetitionsFilterBar';
 import CompetitionCard from '../components/CompetitionCard';
 import { mockCompetitions } from '../data/mockCompetitions';
 
+/**
+ * CompetitionsPage Component
+ * 
+ * An advanced feature page listing University/Global Hackathons and Competitions.
+ * Supports specialized filters (Team Size, Category), rendering `CompetitionCard` components,
+ * and maintains an active Modal dialog state for viewing extended competition details in a popup.
+ * 
+ * @returns {JSX.Element} The competitions interface.
+ */
 export default function CompetitionsPage() {
     const { user } = useAuth();
     const [competitions, setCompetitions] = useState([]);

@@ -8,6 +8,15 @@ import UserMenu from './UserMenu';
 import MobileDrawer from './MobileDrawer';
 import { Menu } from 'lucide-react';
 
+/**
+ * TopNavbar Component
+ * 
+ * The main global navigation header for the InterNova application.
+ * Manages responsive states (desktop vs mobile hamburger menu) and conditionally 
+ * renders authentication and profile actions based on the user's login state.
+ * 
+ * @returns {JSX.Element} The sticky top navigation header.
+ */
 export default function TopNavbar() {
     const { user } = useAuth();
     const [isMobileOpen, setIsMobileOpen] = useState(false);

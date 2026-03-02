@@ -1,6 +1,15 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 
+/**
+ * DashboardWelcomeRow Component
+ * 
+ * The hero section of the V2 Student Dashboard.
+ * Displays a personalized greeting based on the user's authenticated email,
+ * alongside a visual profile completion tracking card.
+ * 
+ * @returns {JSX.Element} The welcome banner and profile status card.
+ */
 export default function DashboardWelcomeRow() {
     const { user } = useAuth();
 

@@ -1,6 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+/**
+ * CompanyDashboard Component
+ * 
+ * The default landing dashboard for authenticated Company-role users.
+ * Currently serves as a placeholder layout for future employer-specific features
+ * (e.g., managing posted internships and reviewing student applications).
+ * 
+ * @returns {JSX.Element} The company dashboard layout.
+ */
 export default function CompanyDashboard() {
     const { user, logout } = useAuth()
     const navigate = useNavigate()

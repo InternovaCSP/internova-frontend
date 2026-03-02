@@ -2,6 +2,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+/**
+ * UserMenu Component
+ * 
+ * A dropdown menu linked to the user's avatar in the top navbar.
+ * Displays user identity context (Role, Email) and provides quick links
+ * to Profile, Settings, and the Logout action.
+ * 
+ * @param {Object} props
+ * @param {Object} props.user - The currently authenticated user object from AuthContext.
+ * @returns {JSX.Element} The interactive dropdown menu component.
+ */
 export default function UserMenu({ user }) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);

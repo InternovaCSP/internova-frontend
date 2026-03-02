@@ -6,6 +6,15 @@ import FiltersBar from '../components/FiltersBar';
 import InternshipCard from '../components/InternshipCard';
 import { initialMockInternships } from '../data/mockInternships';
 
+/**
+ * InternshipsPage Component
+ * 
+ * The primary public-facing grid displaying available internship opportunities.
+ * Connects with `FiltersBar` for complex active filtering by Role, Location, and Work Type.
+ * Implements a responsive grid containing `InternshipCard` components based on mock data.
+ * 
+ * @returns {JSX.Element} The list/filter page for internships.
+ */
 const InternshipsPage = () => {
     const { user } = useAuth();
 

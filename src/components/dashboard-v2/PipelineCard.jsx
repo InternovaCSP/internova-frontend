@@ -1,5 +1,13 @@
 import React from 'react';
 
+/**
+ * PipelineCard Component
+ * 
+ * Visualizes the classic Application tracking funnel (Applied -> Shortlisted -> Interviewing).
+ * Uses absolute positioning for a horizontal connection line indicating drop-off stages.
+ * 
+ * @returns {JSX.Element} The application pipeline funnel card.
+ */
 export default function PipelineCard() {
     return (
         <div className="dash-v2-card">
