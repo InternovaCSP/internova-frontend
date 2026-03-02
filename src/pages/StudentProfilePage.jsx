@@ -216,33 +216,37 @@ export default function StudentProfilePage() {
             {/* Header / Navbar */}
             <div className="pr-header-wrap">
                 <div className="pr-container">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
-                        <img src="/logo-long.png" alt="Internova" style={{ height: '26px' }} />
-                        <div style={{ display: 'flex', gap: '16px' }}>
-                            <Link to="/student/dashboard" className="pr-btn pr-btn-ghost" style={{ padding: '6px 12px' }}>
-                                <ArrowLeft size={16} /> Dashboard
-                            </Link>
-                            <button
-                                onClick={() => { logout(); navigate('/login'); }}
-                                className="pr-btn pr-btn-ghost"
-                                style={{ padding: '6px 12px' }}>
-                                Sign Out
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="pr-header">
+                    <div className="pr-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingBottom: '24px' }}>
                         <div>
                             <h1 className="pr-h1">Profile</h1>
                             <p className="pr-subtext">Manage your academic and professional details.</p>
                         </div>
-                        <div className="pr-progress-wrap">
-                            <div className="pr-progress-meta">
-                                {progress === 100 && <span className="pr-badge-complete">Complete</span>}
-                                {progress}%
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+                            <div className="pr-progress-wrap" style={{ textAlign: 'right', minWidth: '180px' }}>
+                                <div className="pr-progress-meta">
+                                    {progress === 100 && <span className="pr-badge-complete">Complete</span>}
+                                    {progress}%
+                                </div>
+                                <div className="pr-progress-track">
+                                    <div className="pr-progress-fill" style={{ width: `${progress}%` }}></div>
+                                </div>
                             </div>
-                            <div className="pr-progress-track">
-                                <div className="pr-progress-fill" style={{ width: `${progress}%` }}></div>
+
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <button
+                                    className="pr-btn pr-btn-ghost"
+                                    onClick={handleCancel}
+                                    disabled={isSaving || !isDirty}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className="pr-btn pr-btn-primary"
+                                    onClick={handleSubmit}
+                                    disabled={isSaving || !profile.universityId || (!resumeUrl && !resumeFile) || !isDirty}
+                                >
+                                    {isSaving ? <><Loader2 size={16} className="sp-spinner" /> Saving...</> : 'Save Changes'}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -461,26 +465,7 @@ export default function StudentProfilePage() {
                 </div>
             </div>
 
-            {/* Sticky Action Bar */}
-            <div className={`pr-actions-bar ${isDirty ? 'visible' : ''}`}>
-                <div className="pr-actions-container">
-                    {isDirty && <span style={{ fontSize: '13px', color: 'var(--pr-text-muted)', marginRight: 'auto' }}>You have unsaved changes.</span>}
-                    <button
-                        className="pr-btn pr-btn-ghost"
-                        onClick={handleCancel}
-                        disabled={isSaving}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="pr-btn pr-btn-primary"
-                        onClick={handleSubmit}
-                        disabled={isSaving || !profile.universityId || (!resumeUrl && !resumeFile)}
-                    >
-                        {isSaving ? <><Loader2 size={16} className="sp-spinner" /> Saving...</> : 'Save changes'}
-                    </button>
-                </div>
-            </div>
+
 
         </div>
     );
