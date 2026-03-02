@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 // Import New Dashboard Components
 import StudentSidebar from '../components/StudentSidebar';
-import DashboardTopNav from '../components/DashboardTopNav';
+
 import StatsCard from '../components/StatsCard';
 import ApplicationPipeline from '../components/ApplicationPipeline';
 import ActivityFeed from '../components/ActivityFeed';
@@ -40,7 +40,7 @@ export default function StudentDashboard() {
             <StudentSidebar onLogout={handleLogout} />
 
             <div className="dash-main">
-                <DashboardTopNav />
+
 
                 <div className="dash-content">
                     {/* Welcome Header */}

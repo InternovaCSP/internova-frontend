@@ -26,24 +26,6 @@ export default function LandingPage() {
     return (
         <div className="lp-root">
 
-            {/* ── A) STICKY NAVBAR ── */}
-            <nav className={`lp-nav ${isScrolled ? 'lp-nav--scrolled' : ''}`}>
-                <div className="lp-container">
-                    <Link to="/" className="lp-nav-logo">
-                        <img src="/logo-mono-long.png" alt="InterNova" />
-                    </Link>
-                    <div className="lp-nav-links">
-                        <Link to="/internships" className="lp-nav-link">Internships</Link>
-                        <Link to="/projects" className="lp-nav-link">Projects</Link>
-                        <Link to="/competitions" className="lp-nav-link">Competitions</Link>
-                    </div>
-                    <div className="lp-nav-actions">
-                        <Link to="/login" className="lp-btn lp-btn--outline">Login</Link>
-                        <Link to="/register" className="lp-btn lp-btn--primary">Register</Link>
-                        <button className="lp-hamburger"><Menu size={24} /></button>
-                    </div>
-                </div>
-            </nav>
 
             {/* ── B) HERO PREMIUM OPTION A ── */}
             <section className="lp-hero">

@@ -1,22 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, AlertCircle } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
-import { login } from '../api/authApi';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
+    const { login, user } = useAuth();
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [pendingRedirect, setPendingRedirect] = useState(false);
+
+    /**
+     * Navigate AFTER AuthContext has committed the user state.
+     *
+     * Why this matters:
+     * login() calls setToken + setUser inside AuthContext. React batches these
+     * state updates and commits them asynchronously. If we call navigate()
+     * in the same synchronous block, ProtectedRoute renders with the OLD
+     * user state (null) and immediately redirects back to /login.
+     *
+     * By setting pendingRedirect=true and watching user in a useEffect, we
+     * guarantee navigation only happens AFTER the re-render where user is set.
+     */
+    useEffect(() => {
+        if (pendingRedirect && user) {
+            const roleRoutes = {
+                Student: '/student/dashboard',
+                Company: '/company/dashboard',
+                Admin: '/admin/dashboard',
+            };
+            navigate(roleRoutes[user.role] ?? '/', { replace: true });
+            setPendingRedirect(false);
+        }
+    }, [pendingRedirect, user, navigate]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-        setErrorMsg(''); // Clear error on change
+        setErrorMsg('');
     };
 
     const handleSubmit = async (e) => {
@@ -25,14 +48,11 @@ export default function LoginPage() {
         setErrorMsg('');
 
         try {
-            const data = await login(formData.email, formData.password);
-            // Save JWT from AuthResponse DTO
-            localStorage.setItem('internova_token', data.token);
-            // Route to the correct dashboard based on role
-            const roleRoutes = { Student: '/student/dashboard', Company: '/company/dashboard', Admin: '/admin/dashboard' };
-            navigate(roleRoutes[data.role] ?? '/');
+            await login(formData.email, formData.password);
+            // Signal the useEffect to redirect once user state is confirmed
+            setPendingRedirect(true);
         } catch (error) {
-            setErrorMsg(error.response?.data?.error || 'Failed to connect to the server.');
+            setErrorMsg(error.response?.data?.error || 'Invalid email or password.');
         } finally {
             setIsLoading(false);
         }

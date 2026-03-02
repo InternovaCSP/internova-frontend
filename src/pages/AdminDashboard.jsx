@@ -12,12 +12,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="dashboard">
-            <nav className="dashboard-nav">
-                <img src="/logo-long.png" alt="Internova" className="brand" style={{ height: '28px', objectFit: 'contain' }} />
-                <button className="btn btn-ghost" style={{ width: 'auto', padding: '.45rem 1rem' }} onClick={handleLogout}>
-                    Sign Out
-                </button>
-            </nav>
+
             <div className="dashboard-body">
                 <span className="role-badge" style={{ background: 'rgba(255,92,122,.1)', color: 'var(--danger)', borderColor: 'rgba(255,92,122,.3)' }}>
                     Admin

@@ -86,32 +86,7 @@ const InternshipsPage = () => {
 
     return (
         <div className="in-shell">
-            {/* ── Navbar ── */}
-            <nav className="lp-nav lp-nav--scrolled" style={{ position: 'sticky', top: 0, zIndex: 50 }}>
-                <div className="lp-container">
-                    <Link to="/" className="lp-nav-logo">
-                        <img src="/logo-mono-long.png" alt="InterNova" />
-                    </Link>
-                    <div className="lp-nav-links">
-                        <Link to="/internships" className="lp-nav-link">Internships</Link>
-                        <Link to="/projects" className="lp-nav-link">Projects</Link>
-                        <Link to="/competitions" className="lp-nav-link">Competitions</Link>
-                    </div>
-                    <div className="lp-nav-actions">
-                        {user ? (
-                            <Link to={`/${user.role.toLowerCase()}/dashboard`} className="lp-btn lp-btn--primary">
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <>
-                                <Link to="/login" className="lp-btn lp-btn--outline">Login</Link>
-                                <Link to="/register" className="lp-btn lp-btn--primary">Register</Link>
-                            </>
-                        )}
-                        <button className="lp-hamburger"><Menu size={24} /></button>
-                    </div>
-                </div>
-            </nav>
+
 
             <div className="in-container">
 

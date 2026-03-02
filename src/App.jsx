@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
+import TopNavbar from './components/TopNavbar'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
@@ -14,52 +15,55 @@ import CompetitionsPage from './pages/CompetitionsPage'
 
 function App() {
     return (
-        <Routes>
-            {/* Public */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/internships" element={<InternshipsPage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/competitions" element={<CompetitionsPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+        <>
+            <TopNavbar />
+            <Routes>
+                {/* Public */}
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/internships" element={<InternshipsPage />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/competitions" element={<CompetitionsPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-            {/* Protected — role-gated */}
-            <Route
-                path="/student/dashboard"
-                element={
-                    <ProtectedRoute allowedRoles={['Student']}>
-                        <StudentDashboard />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/student/profile"
-                element={
-                    <ProtectedRoute allowedRoles={['Student']}>
-                        <StudentProfilePage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/company/dashboard"
-                element={
-                    <ProtectedRoute allowedRoles={['Company']}>
-                        <CompanyDashboard />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/admin/dashboard"
-                element={
-                    <ProtectedRoute allowedRoles={['Admin']}>
-                        <AdminDashboard />
-                    </ProtectedRoute>
-                }
-            />
+                {/* Protected — role-gated */}
+                <Route
+                    path="/student/dashboard"
+                    element={
+                        <ProtectedRoute allowedRoles={['Student']}>
+                            <StudentDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/student/profile"
+                    element={
+                        <ProtectedRoute allowedRoles={['Student']}>
+                            <StudentProfilePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/company/dashboard"
+                    element={
+                        <ProtectedRoute allowedRoles={['Company']}>
+                            <CompanyDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/dashboard"
+                    element={
+                        <ProtectedRoute allowedRoles={['Admin']}>
+                            <AdminDashboard />
+                        </ProtectedRoute>
+                    }
+                />
 
-            {/* Catch-all */}
-            <Route path="*" element={<NotFound />} />
-        </Routes>
+                {/* Catch-all */}
+                <Route path="*" element={<NotFound />} />
+            </Routes>
+        </>
     )
 }
 
