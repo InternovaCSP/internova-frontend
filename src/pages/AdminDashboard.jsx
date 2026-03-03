@@ -1,6 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+/**
+ * AdminDashboard Component
+ * 
+ * The protected dashboard interface specifically for Administrative users.
+ * Currently serves as a specialized layout shell for moderating the platform,
+ * managing university-partner relationships, and overseeing standard users.
+ * 
+ * @returns {JSX.Element} The admin dashboard layout.
+ */
 export default function AdminDashboard() {
     const { user, logout } = useAuth()
     const navigate = useNavigate()
@@ -12,12 +21,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="dashboard">
-            <nav className="dashboard-nav">
-                <img src="/logo-long.png" alt="Internova" className="brand" style={{ height: '28px', objectFit: 'contain' }} />
-                <button className="btn btn-ghost" style={{ width: 'auto', padding: '.45rem 1rem' }} onClick={handleLogout}>
-                    Sign Out
-                </button>
-            </nav>
+
             <div className="dashboard-body">
                 <span className="role-badge" style={{ background: 'rgba(255,92,122,.1)', color: 'var(--danger)', borderColor: 'rgba(255,92,122,.3)' }}>
                     Admin

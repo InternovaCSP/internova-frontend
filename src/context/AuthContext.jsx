@@ -1,3 +1,11 @@
+/**
+ * context/AuthContext.jsx
+ * 
+ * Global Authentication Provider for the InterNova React frontend.
+ * Responsible for managing the JWT lifecycle, decoding token payloads to track user roles,
+ * persisting session state across reloads, and providing a unified Context API
+ * for login, registration, and logout operations globally.
+ */
 import { createContext, useContext, useState, useCallback, useMemo } from 'react'
 import { jwtDecode } from 'jwt-decode'
 import api from '../services/api'
@@ -22,6 +30,13 @@ function parseToken(token) {
     }
 }
 
+/**
+ * Provides the AuthContext to its child components.
+ * Manages token state and synchronizes it with local storage.
+ * 
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Application tree wrapped inside the provider.
+ */
 export function AuthProvider({ children }) {
     const [token, setToken] = useState(() => localStorage.getItem('internova_token'))
     const [user, setUser] = useState(() => parseToken(localStorage.getItem('internova_token')))
