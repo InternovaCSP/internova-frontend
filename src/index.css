@@ -4820,3 +4820,28 @@ body {
     grid-template-columns: 1fr 1fr;
   }
 }
+/* -- Admin Dashboard Specifics -- */
+.dashboard-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--lp-navy);
+  margin-bottom: 8px;
+}
+
+.dashboard-meta {
+  font-size: 16px;
+  color: var(--lp-text-secondary);
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+  margin-bottom: 12px;
+}
