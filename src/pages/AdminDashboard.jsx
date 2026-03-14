@@ -24,15 +24,9 @@ export default function AdminDashboard() {
         <div className="dashboard">
 
             <div className="dashboard-body">
-                <span className="role-badge" style={{ background: 'rgba(255,92,122,.1)', color: 'var(--danger)', borderColor: 'rgba(255,92,122,.3)' }}>
-                    Admin
-                </span>
-                <h1 className="dashboard-title" style={{ color: 'var(--lp-navy)' }}>Admin Dashboard</h1>
+                <h1 className="dashboard-title" style={{ color: 'var(--lp-navy)' }}>Dashboard</h1>
                 <p className="dashboard-meta" style={{ color: 'var(--lp-navy)', fontWeight: 500 }}>
                     Welcome, <span style={{ color: 'var(--lp-blue)' }}>{user?.email}</span>
-                </p>
-                <p className="dashboard-meta" style={{ color: 'var(--lp-text-secondary)', fontSize: '.82rem', marginBottom: '32px' }}>
-                    Centralized platform oversight and management.
                 </p>
 
                 <div className="dash-mock-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
@@ -57,7 +51,7 @@ export default function AdminDashboard() {
                         </div>
                         <div>
                             <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--lp-navy)', marginBottom: '8px' }}>Company Approvals</h3>
-                            <p style={{ fontSize: '14px', color: 'var(--lp-text-secondary)', lineHeight: '1.5' }}>Review registration requests and verify new industry partners for the platform.</p>
+                            <p style={{ fontSize: '14px', color: 'var(--lp-text-secondary)', lineHeight: '1.5' }}>Review and verify company registrations.</p>
                         </div>
                     </button>
 

@@ -27,7 +27,10 @@ export default function AdminCompaniesPage() {
         try {
             setLoading(true);
             const data = await fetchPendingCompanies();
-            setCompanies(data);
+            
+            // Handle various backend response formats (direct array or { value: [], ... })
+            const list = Array.isArray(data) ? data : (data?.value || data?.companies || data?.$values || []);
+            setCompanies(list);
             setError(null);
         } catch (err) {
             console.error("Failed to fetch pending companies:", err);
@@ -41,12 +44,12 @@ export default function AdminCompaniesPage() {
         try {
             setProcessingId(companyId);
             await approveCompany(companyId);
-
-            // Optimistic UI Update: Remove the approved company from the list locally
-            setCompanies(prev => prev.filter(c => c.companyId !== companyId));
+            
+            // Success! Remove from local list
+            setCompanies(prev => prev.filter(c => (c.companyId || c.CompanyId) !== companyId));
         } catch (err) {
             console.error(`Failed to approve company ${companyId}:`, err);
-            alert("Approval failed. Please check the network and try again.");
+            alert("Approval failed. Please ensure the backend is running and try again.");
         } finally {
             setProcessingId(null);
         }
@@ -55,107 +58,123 @@ export default function AdminCompaniesPage() {
     return (
         <div className="dashboard">
             <div className="dashboard-body">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-                    <button
-                        onClick={() => navigate('/admin/dashboard')}
-                        className="dash-icon-btn"
-                        style={{ background: 'var(--auth-slate)', padding: '8px' }}
-                        title="Back to Dashboard"
-                    >
-                        <ArrowLeft size={20} />
-                    </button>
-                    <div>
-                        <span className="role-badge" style={{ background: 'rgba(0,120,212,.1)', color: 'var(--lp-blue)', borderColor: 'rgba(0,120,212,.3)' }}>
-                            Moderation
-                        </span>
-                        <h1 className="dashboard-title" style={{ marginTop: '4px' }}>Pending Approvals</h1>
+                {/* Header Section */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <button
+                            onClick={() => navigate('/admin/dashboard')}
+                            className="dash-icon-btn"
+                            style={{ background: 'var(--auth-slate)', padding: '10px', borderRadius: '12px' }}
+                        >
+                            <ArrowLeft size={20} />
+                        </button>
+                        <div>
+                            <h1 className="dashboard-title">Company Approvals</h1>
+                            <p style={{ color: 'var(--muted)', fontSize: '14px' }}>Review and verify newly registered organizations</p>
+                        </div>
                     </div>
                 </div>
 
                 {loading ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', color: 'var(--muted)' }}>
-                        <Loader2 className="spinner" style={{ borderTopColor: 'var(--primary)', marginBottom: '16px' }} />
-                        <p>Fetching pending requests...</p>
+                    <div style={{ textAlign: 'center', padding: '100px 0' }}>
+                        <Loader2 className="spinner" size={40} color="var(--primary)" />
+                        <p style={{ marginTop: '16px', color: 'var(--muted)' }}>Loading pending requests...</p>
                     </div>
                 ) : error ? (
-                    <div style={{ padding: '24px', background: 'rgba(255,92,122,.05)', border: '1px solid rgba(255,92,122,.2)', borderRadius: '12px', color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <AlertCircle size={24} />
+                    <div style={{ padding: '24px', background: '#fff5f5', border: '1px solid #feb2b2', borderRadius: '12px', color: '#c53030' }}>
+                        <AlertCircle size={24} style={{ marginBottom: '8px' }} />
                         <p>{error}</p>
                     </div>
                 ) : companies.length === 0 ? (
-                    <div style={{ padding: '48px', textAlign: 'center', background: 'var(--auth-white)', borderRadius: '16px', border: '1px dashed var(--auth-border)' }}>
-                        <div style={{ width: '64px', height: '64px', background: 'var(--auth-slate)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                            <CheckCircle size={32} color="var(--success)" />
+                    <div style={{ padding: '64px 24px', textAlign: 'center', background: '#fff', borderRadius: '24px', border: '1px dashed #cbd5e0' }}>
+                        <div style={{ width: '80px', height: '80px', background: '#f0fff4', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+                            <CheckCircle size={40} color="#48bb78" />
                         </div>
-                        <h3 style={{ color: 'var(--auth-navy)', marginBottom: '8px' }}>All caught up!</h3>
-                        <p style={{ color: 'var(--muted)' }}>There are no companies currently awaiting approval.</p>
+                        <h2 style={{ color: 'var(--auth-navy)', fontSize: '24px', marginBottom: '8px' }}>Wonderful!</h2>
+                        <p style={{ color: 'var(--muted)' }}>All companies have been processed and approved.</p>
                     </div>
                 ) : (
-                    <div className="lp-mock-card" style={{ padding: '0', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead>
-                                <tr style={{ background: 'var(--auth-slate)', borderBottom: '1px solid var(--auth-border)' }}>
-                                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 600, color: 'var(--auth-navy)' }}>Company Name</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 600, color: 'var(--auth-navy)' }}>Industry</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 600, color: 'var(--auth-navy)' }}>Website</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 600, color: 'var(--auth-navy)', textAlign: 'right' }}>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {companies.map((company) => (
-                                    <tr key={company.companyId} style={{ borderBottom: '1px solid var(--auth-border)', transition: 'background 0.2s' }} className="hover-row">
-                                        <td style={{ padding: '16px 24px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                <div style={{ width: '40px', height: '40px', background: 'var(--auth-slate)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--lp-blue)' }}>
-                                                    <Building2 size={20} />
-                                                </div>
-                                                <span style={{ fontWeight: 600, color: 'var(--auth-navy)' }}>{company.name}</span>
-                                            </div>
-                                        </td>
-                                        <td style={{ padding: '16px 24px', color: 'var(--lp-text-secondary)', fontSize: '14px' }}>
-                                            {company.industry || 'Not specified'}
-                                        </td>
-                                        <td style={{ padding: '16px 24px' }}>
-                                            {company.website ? (
-                                                <a href={company.website} target="_blank" rel="noopener noreferrer" className="auth-link" style={{ fontSize: '14px' }}>
-                                                    {company.website.replace(/^https?:\/\//, '')}
-                                                </a>
-                                            ) : (
-                                                <span style={{ color: 'var(--muted)', fontSize: '14px' }}>N/A</span>
-                                            )}
-                                        </td>
-                                        <td style={{ padding: '16px 24px', textAlign: 'right' }}>
-                                            <button
-                                                onClick={() => handleApprove(company.companyId)}
-                                                disabled={processingId === company.companyId}
-                                                className="lp-btn lp-btn--teal"
-                                                style={{ padding: '8px 16px', fontSize: '13px', borderRadius: '8px' }}
-                                            >
-                                                {processingId === company.companyId ? (
-                                                    <Loader2 className="spinner" style={{ width: '14px', height: '14px' }} />
-                                                ) : (
-                                                    'Approve'
+                    <div style={{ display: 'grid', gap: '20px' }}>
+                        {companies.map((company, index) => {
+                            const id = company?.companyId || company?.CompanyId || index;
+                            const name = company?.companyName || company?.CompanyName || 'New Company';
+                            const industry = company?.industry || company?.Industry || 'Sector not specified';
+                            const website = company?.websiteUrl || company?.WebsiteUrl;
+
+                            return (
+                                <div key={id} className="lp-mock-card" style={{ 
+                                    padding: '24px', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'space-between',
+                                    border: '1px solid var(--auth-border)',
+                                    transition: 'transform 0.2s, box-shadow 0.2s',
+                                    cursor: 'default'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                        <div style={{ 
+                                            width: '64px', 
+                                            height: '64px', 
+                                            background: 'var(--auth-slate)', 
+                                            borderRadius: '16px', 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            justifyContent: 'center',
+                                            color: 'var(--primary)'
+                                        }}>
+                                            <Building2 size={32} />
+                                        </div>
+                                        <div>
+                                            <h3 style={{ fontSize: '18px', color: 'var(--auth-navy)', marginBottom: '4px', fontWeight: 700 }}>{name}</h3>
+                                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                                <span style={{ fontSize: '14px', color: '#718096', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    {industry}
+                                                </span>
+                                                {website && (
+                                                    <a href={website} target="_blank" rel="noopener noreferrer" 
+                                                       style={{ fontSize: '14px', color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}>
+                                                        {website.replace(/^https?:\/\//, '')}
+                                                    </a>
                                                 )}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button
+                                        onClick={() => handleApprove(id)}
+                                        disabled={processingId === id}
+                                        className="lp-btn lp-btn--teal"
+                                        style={{ 
+                                            padding: '12px 24px', 
+                                            borderRadius: '12px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            fontWeight: 600
+                                        }}
+                                    >
+                                        {processingId === id ? (
+                                            <Loader2 size={18} className="spinner" />
+                                        ) : (
+                                            <>
+                                                <CheckCircle size={18} />
+                                                Approve Company
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>
 
             <style>{`
-                .hover-row:hover {
-                    background: #f8fafc;
-                }
-                .spinner {
-                    animation: spin 1s linear infinite;
-                }
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
+                .spinner { animation: spin 1s linear infinite; }
+                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                .lp-mock-card:hover { 
+                    transform: translateY(-2px);
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
                 }
             `}</style>
         </div>
