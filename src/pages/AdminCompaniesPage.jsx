@@ -115,13 +115,9 @@ export default function AdminCompaniesPage() {
                     </div>
                 </header>
 
-                <div style={{ padding: '40px', maxWidth: '1200px' }}>
-                    {/* Page Title & Tabs */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-                        <div>
-                            <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>Companies</h1>
-                            <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>{activeTab === 'pending' ? 'Review newly registered organizations' : 'Overview of all companies'}</p>
-                        </div>
+                <div style={{ padding: '32px 40px', maxWidth: '1200px' }}>
+                    {/* Tabs area */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '24px' }}>
 
                         <div style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                             <button 

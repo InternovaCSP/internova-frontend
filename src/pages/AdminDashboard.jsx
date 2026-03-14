@@ -62,13 +62,8 @@ export default function AdminDashboard() {
                 </header>
 
                 {/* Dashboard Body */}
-                <div style={{ padding: '40px', maxWidth: '1200px' }}>
-                    <div style={{ marginBottom: '32px' }}>
-                        <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>Dashboard</h1>
-                        <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>
-                            Welcome back, administrator. Here's what's happening today.
-                        </p>
-                    </div>
+                <div style={{ padding: '32px 40px', maxWidth: '1200px' }}>
+                    
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px' }}>
                         <button

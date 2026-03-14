@@ -84,18 +84,19 @@ export default function AdminSettingsPage() {
                     </button>
                 </header>
 
-                <div style={{ padding: '40px', maxWidth: '1000px' }}>
-                    <div style={{ marginBottom: '32px' }}>
-                        <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>Settings</h1>
-                        <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>
-                            Manage your administrative account and platform-wide configurations.
-                        </p>
-                    </div>
+                <div style={{ padding: '32px 40px', maxWidth: '1000px' }}>
+                  
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '40px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
                         
-                        {/* Settings Navigation */}
-                        <aside style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {/* Settings Navigation - Horizontal Tabs */}
+                        <div style={{ 
+                            display: 'flex', 
+                            gap: '8px', 
+                            borderBottom: '1px solid #e2e8f0', 
+                            marginBottom: '24px',
+                            padding: '0 4px'
+                        }}>
                             {sections.map(section => (
                                 <button
                                     key={section.id}
@@ -103,27 +104,34 @@ export default function AdminSettingsPage() {
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '12px',
-                                        padding: '12px 16px',
-                                        borderRadius: '10px',
+                                        gap: '10px',
+                                        padding: '12px 20px',
                                         border: 'none',
-                                        background: activeSection === section.id ? '#eff6ff' : 'transparent',
+                                        background: 'transparent',
                                         color: activeSection === section.id ? '#2563eb' : '#64748b',
                                         cursor: 'pointer',
-                                        textAlign: 'left',
                                         fontWeight: activeSection === section.id ? 600 : 500,
                                         fontSize: '14px',
-                                        transition: 'all 0.2s'
+                                        transition: 'all 0.2s',
+                                        position: 'relative',
+                                        borderBottom: activeSection === section.id ? '2px solid #2563eb' : '2px solid transparent',
+                                        marginBottom: '-1px'
                                     }}
                                 >
                                     {section.icon}
                                     {section.name}
                                 </button>
                             ))}
-                        </aside>
+                        </div>
 
                         {/* Settings Content */}
-                        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '32px', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+                        <div style={{ 
+                            background: 'white', 
+                            border: '1px solid #e2e8f0', 
+                            borderRadius: '16px', 
+                            padding: '32px', 
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.05)' 
+                        }}>
                             
                             {activeSection === 'profile' && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -146,7 +154,21 @@ export default function AdminSettingsPage() {
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             <label style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Email Address</label>
-                                            <input type="email" defaultValue={user?.email} style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px', outline: 'none' }} />
+                                            <input 
+                                                type="email" 
+                                                defaultValue={user?.email} 
+                                                readOnly 
+                                                style={{ 
+                                                    padding: '10px 14px', 
+                                                    borderRadius: '8px', 
+                                                    border: '1px solid #e2e8f0', 
+                                                    fontSize: '14px', 
+                                                    outline: 'none',
+                                                    background: '#f1f5f9',
+                                                    color: '#64748b',
+                                                    cursor: 'not-allowed'
+                                                }} 
+                                            />
                                         </div>
                                     </div>
                                     
