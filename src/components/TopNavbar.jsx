@@ -27,6 +27,11 @@ export default function TopNavbar() {
         setIsMobileOpen(false);
     }, [location.pathname]);
 
+    // Hide Navbar on Admin pages as they use a custom Sidebar/Header layout
+    if (location.pathname.startsWith('/admin')) {
+        return null;
+    }
+
     return (
         <header className="in-navbar-wrapper">
             {/* Accessibility Skip Link */}
