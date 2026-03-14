@@ -18,6 +18,11 @@ export const fetchPendingCompanies = async () => {
     return response.data;
 };
 
+export const fetchAllCompanies = async () => {
+    const response = await apiClient.get('/admin/companies');
+    return response.data;
+};
+
 /**
  * Approves a company registration.
  * @param {string|number} companyId - ID of the company to approve.
