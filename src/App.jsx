@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage'
 import StudentDashboard from './pages/StudentDashboard'
 import CompanyDashboard from './pages/CompanyDashboard'
 import AdminDashboard from './pages/AdminDashboard'
+import AdminCompaniesPage from './pages/AdminCompaniesPage'
 import StudentProfilePage from './pages/StudentProfilePage'
 import NotFound from './pages/NotFound'
 import InternshipsPage from './pages/InternshipsPage'
@@ -70,6 +71,15 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route
+                    path="/admin/companies"
+                    element={
+                        <ProtectedRoute allowedRoles={['Admin']}>
+                            <AdminCompaniesPage />
+                        </ProtectedRoute>
+                    }
+                />
+
 
                 {/* Catch-all */}
                 <Route path="*" element={<NotFound />} />
