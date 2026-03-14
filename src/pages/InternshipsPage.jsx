@@ -4,7 +4,8 @@ import { Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import FiltersBar from '../components/FiltersBar';
 import InternshipCard from '../components/InternshipCard';
-import { initialMockInternships } from '../data/mockInternships';
+import internshipService from '../services/internshipService';
+import Modal from '../components/Modal';
 
 /**
  * InternshipsPage Component
@@ -20,6 +21,7 @@ const InternshipsPage = () => {
 
     const [internships, setInternships] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedInternship, setSelectedInternship] = useState(null);
 
     // Filter States
     const [searchQuery, setSearchQuery] = useState('');
@@ -28,14 +30,20 @@ const InternshipsPage = () => {
     const [statusFilter, setStatusFilter] = useState('');
     const [sortBy, setSortBy] = useState('newest');
 
-    // Load mock data with fake delay
+    // Load real data from database
     useEffect(() => {
-        setIsLoading(true);
-        const timer = setTimeout(() => {
-            setInternships(initialMockInternships);
-            setIsLoading(false);
-        }, 800);
-        return () => clearTimeout(timer);
+        const fetchInternships = async () => {
+            setIsLoading(true);
+            try {
+                const data = await internshipService.getAllInternships();
+                setInternships(data);
+            } catch (error) {
+                console.error('Failed to load internships:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchInternships();
     }, []);
 
     // Handle actions (mock)
@@ -46,6 +54,14 @@ const InternshipsPage = () => {
             }
             return internship;
         }));
+    };
+
+    const handleViewDetails = (internship) => {
+        setSelectedInternship(internship);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedInternship(null);
     };
 
     // Derived state: Filtered & Sorted Data
@@ -150,6 +166,7 @@ const InternshipsPage = () => {
                                     internship={internship}
                                     userRole={user?.role}
                                     onApply={() => handleApply(internship.id)}
+                                    onViewDetails={handleViewDetails}
                                 />
                             ))}
                         </div>
@@ -178,6 +195,94 @@ const InternshipsPage = () => {
                         </button>
                     </div>
                 )}
+
+                {/* Internship Detail Modal */}
+                <Modal
+                    isOpen={!!selectedInternship}
+                    onClose={handleCloseModal}
+                    title="Internship Overview"
+                    footer={
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                            <button className="in-btn in-btn-outline" onClick={handleCloseModal}>
+                                Dismiss
+                            </button>
+                            {user?.role === 'Student' && (
+                                <button 
+                                    className={`in-btn ${selectedInternship?.currentUserStatus ? 'in-btn-disabled' : 'in-btn-secondary'}`}
+                                    disabled={!!selectedInternship?.currentUserStatus || selectedInternship?.status === 'Closed'}
+                                    onClick={() => {
+                                        handleApply(selectedInternship.id);
+                                        handleCloseModal();
+                                    }}
+                                >
+                                    {selectedInternship?.currentUserStatus ? 'Already Applied' : 'Apply for this Role'}
+                                </button>
+                            )}
+                        </div>
+                    }
+                >
+                    {selectedInternship && (
+                        <div className="in-modal-content-refined">
+                            <div style={{ marginBottom: '32px', borderBottom: '1px solid #f1f5f9', paddingBottom: '24px' }}>
+                                <h3 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>{selectedInternship.title}</h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ color: '#0ea5e9', fontWeight: 700, fontSize: '18px' }}>@ {selectedInternship.company}</span>
+                                    <span style={{ width: '4px', height: '4px', background: '#cbd5e1', borderRadius: '50%' }}></span>
+                                    <span style={{ color: '#64748b', fontSize: '15px' }}>{selectedInternship.location}</span>
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', marginBottom: '40px' }}>
+                                <div style={{ flex: '1 1 200px' }}>
+                                    <h4 style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Experience Details</h4>
+                                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        <li style={{ fontSize: '15px', color: '#334155' }}>
+                                            <strong style={{ color: '#0f172a' }}>Duration:</strong> {selectedInternship.duration}
+                                        </li>
+                                        <li style={{ fontSize: '15px', color: '#334155' }}>
+                                            <strong style={{ color: '#0f172a' }}>Posted On:</strong> {new Date(selectedInternship.postedAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                                        </li>
+                                        <li style={{ fontSize: '15px', color: '#334155' }}>
+                                            <strong style={{ color: '#0f172a' }}>Status:</strong> {selectedInternship.status}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <section style={{ marginBottom: '32px' }}>
+                                <h4 style={{ fontSize: '14px', color: '#0f172a', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    About the Role
+                                </h4>
+                                <div style={{ fontSize: '16px', lineHeight: '1.7', color: '#475569', background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+                                    {selectedInternship.description}
+                                </div>
+                            </section>
+
+                            {selectedInternship.companyDescription && (
+                                <section style={{ marginBottom: '32px' }}>
+                                    <h4 style={{ fontSize: '14px', color: '#0f172a', fontWeight: 700, marginBottom: '12px' }}>About {selectedInternship.company}</h4>
+                                    <div style={{ fontSize: '15px', lineHeight: '1.6', color: '#475569' }}>
+                                        {selectedInternship.companyDescription}
+                                    </div>
+                                </section>
+                            )}
+
+                            {selectedInternship.requirements && (
+                                <section>
+                                    <h4 style={{ fontSize: '14px', color: '#0f172a', fontWeight: 700, marginBottom: '12px' }}>Key Requirements</h4>
+                                    <div style={{ paddingLeft: '20px' }}>
+                                        {selectedInternship.requirements.split('\n').map((req, i) => (
+                                            <div key={i} style={{ display: 'flex', gap: '12px', marginBottom: '8px', fontSize: '15px', color: '#475569' }}>
+                                                <span style={{ color: '#0ea5e9', fontWeight: 900 }}>•</span>
+                                                <span>{req}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+                        </div>
+                    )}
+                </Modal>
 
             </div>
         </div>
