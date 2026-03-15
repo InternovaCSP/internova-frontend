@@ -190,7 +190,7 @@ export default function AdminSettingsPage() {
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '400px' }}>
                                             <input type="password" placeholder="Current Password" style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px', outline: 'none' }} />
                                             <input type="password" placeholder="New Password" style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px', outline: 'none' }} />
-                                            <button style={{ background: '#334155', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer', width: 'fit-content', padding: '10px 20px' }}>Update Password</button>
+                                            <button style={{ background: '#334155', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer', width: 'fit-content', padding: '10px 20px' }}>Update Password</button>
                                         </div>
                                     </div>
 
