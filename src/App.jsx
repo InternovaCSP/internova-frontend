@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import StudentDashboard from './pages/StudentDashboard'
 import CompanyDashboard from './pages/CompanyDashboard'
+import CreateInternshipPage from './pages/CreateInternshipPage'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminCompaniesPage from './pages/AdminCompaniesPage'
 import AdminSettingsPage from './pages/AdminSettingsPage'
@@ -61,6 +62,14 @@ function App() {
                     element={
                         <ProtectedRoute allowedRoles={['Company']}>
                             <CompanyDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/company/create-internship"
+                    element={
+                        <ProtectedRoute allowedRoles={['Company']}>
+                            <CreateInternshipPage />
                         </ProtectedRoute>
                     }
                 />
