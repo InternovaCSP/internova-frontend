@@ -8,7 +8,8 @@ import {
     LogOut,
     Menu,
     X,
-    Shield
+    Shield,
+    Briefcase
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -32,6 +33,11 @@ const AdminSidebar = () => {
             name: 'Company Approvals', 
             icon: <Building2 size={20} />, 
             path: '/admin/companies' 
+        },
+        { 
+            name: 'Internship Approvals', 
+            icon: <Briefcase size={20} />, 
+            path: '/admin/internships' 
         },
         { 
             name: 'User Management', 
