@@ -10,6 +10,7 @@ import CreateInternshipPage from './pages/CreateInternshipPage'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminCompaniesPage from './pages/AdminCompaniesPage'
 import AdminSettingsPage from './pages/AdminSettingsPage'
+import AdminInternshipsPage from './pages/AdminInternshipsPage'
 import StudentProfilePage from './pages/StudentProfilePage'
 import NotFound from './pages/NotFound'
 import InternshipsPage from './pages/InternshipsPage'
@@ -86,6 +87,14 @@ function App() {
                     element={
                         <ProtectedRoute allowedRoles={['Admin']}>
                             <AdminCompaniesPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/internships"
+                    element={
+                        <ProtectedRoute allowedRoles={['Admin']}>
+                            <AdminInternshipsPage />
                         </ProtectedRoute>
                     }
                 />
