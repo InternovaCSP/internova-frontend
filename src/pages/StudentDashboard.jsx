@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 // Import V2 Dashboard Components
 import DashboardWelcomeRow from '../components/dashboard-v2/DashboardWelcomeRow';
 import KpiCardGrid from '../components/dashboard-v2/KpiCardGrid';
-import AnalyticsRow from '../components/dashboard-v2/AnalyticsRow';
 import ActivityAndRecsRow from '../components/dashboard-v2/ActivityAndRecsRow';
 import InternshipPipeline from '../components/InternshipPipeline';
 
@@ -55,7 +54,6 @@ export default function StudentDashboard() {
                         <DashboardWelcomeRow />
                         <InternshipPipeline />
                         <KpiCardGrid />
-                        <AnalyticsRow />
                         <ActivityAndRecsRow />
 
                         <div style={{ textAlign: 'center', fontSize: '13px', color: '#94a3b8', marginTop: '16px' }}>

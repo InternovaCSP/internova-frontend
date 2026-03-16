@@ -46,9 +46,14 @@ export default function CompanyDashboard() {
                         <h1>Company Dashboard</h1>
                         <p>Welcome back, <strong>{user?.email}</strong>. Manage your talent pipeline.</p>
                     </div>
-                    <Link to="/company/create-internship" className="in-btn in-btn-primary-azure" style={{ gap: '8px' }}>
-                        <Plus size={18} /> Post New Internship
-                    </Link>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <Link to="/company/applications" className="in-btn in-btn-outline-azure" style={{ gap: '8px' }}>
+                            <CheckCircle size={18} /> Manage Applications
+                        </Link>
+                        <Link to="/company/create-internship" className="in-btn in-btn-primary-azure" style={{ gap: '8px' }}>
+                            <Plus size={18} /> Post New Internship
+                        </Link>
+                    </div>
                 </header>
 
                 <section className="dash-v2-analytics-row" style={{ gridTemplateColumns: '1fr' }}>
