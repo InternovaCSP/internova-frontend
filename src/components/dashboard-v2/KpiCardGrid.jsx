@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import KpiCard from './KpiCard';
+import { fetchKpiStats } from '../../api/studentApi';
 
 /**
  * KpiCardGrid Component
@@ -10,20 +11,34 @@ import KpiCard from './KpiCard';
  * @returns {JSX.Element} The container grid with injected KPI cards.
  */
 export default function KpiCardGrid() {
+    const [stats, setStats] = useState({ Applications: '0', Interviews: '0' });
+
+    useEffect(() => {
+        const loadStats = async () => {
+            try {
+                const data = await fetchKpiStats();
+                setStats(data);
+            } catch (err) {
+                console.error("Failed to load KPI stats:", err);
+            }
+        };
+        loadStats();
+    }, []);
+
     return (
         <div className="dash-v2-kpi-grid">
             <KpiCard
                 title="Applications Submitted"
-                count="12"
+                count={stats.Applications}
                 iconName="Briefcase"
-                trend="+2 this week"
+                trend="+0 this week"
                 iconVariant="azure"
             />
             <KpiCard
                 title="Interviews Scheduled"
-                count="3"
+                count={stats.Interviews}
                 iconName="Calendar"
-                trend="+1 this week"
+                trend="+0 this week"
                 iconVariant="azure"
             />
             <KpiCard
