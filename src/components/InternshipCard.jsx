@@ -1,6 +1,6 @@
 import React from 'react';
 
-const InternshipCard = ({ internship, userRole, onApply }) => {
+const InternshipCard = ({ internship, userRole, onApply, onViewDetails }) => {
     const {
         title,
         company,
@@ -96,7 +96,7 @@ const InternshipCard = ({ internship, userRole, onApply }) => {
             </div>
 
             <div className="in-card-footer">
-                <button className="in-btn in-btn-outline">
+                <button className="in-btn in-btn-outline" onClick={() => onViewDetails(internship)}>
                     View Details
                 </button>
                 {isStudent && (

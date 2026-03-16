@@ -167,7 +167,7 @@ export default function StudentProfilePage() {
         }
 
         try {
-            const response = await apiClient.put('/api/student/profile', formData, {
+            const response = await apiClient.put('/student/profile', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 

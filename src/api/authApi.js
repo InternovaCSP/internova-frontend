@@ -6,26 +6,12 @@
  * interceptor to automatically inject the JWT token into all outgoing requests,
  * ensuring secure communication with the backend.
  */
-import axios from 'axios';
+import api from '../services/api';
 
+// Use the centralized api client from services/api.js
+const apiClient = api;
 
-// The proxy in vite.config.js maps /api to the .NET backend (localhost:5128)
-const apiClient = axios.create({
-    headers: {
-        'Content-Type': 'application/json'
-    }
-});
-
-// Interceptor to attach JWT token if it exists
-apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('internova_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-}, (error) => {
-    return Promise.reject(error);
-});
+// Token management is now handled centrally in services/api.js
 
 /**
  * Authenticates a user with the backend.
@@ -34,7 +20,7 @@ apiClient.interceptors.request.use((config) => {
  * @returns {Promise<Object>} The authentication response (token, user details).
  */
 export const login = async (email, password) => {
-    const response = await apiClient.post('/api/auth/login', { email, password });
+    const response = await apiClient.post('/auth/login', { email, password });
     return response.data;
 };
 
@@ -44,7 +30,7 @@ export const login = async (email, password) => {
  * @returns {Promise<Object>} The backend registration response.
  */
 export const register = async (userData) => {
-    const response = await apiClient.post('/api/auth/register', userData);
+    const response = await apiClient.post('/auth/register', userData);
     return response.data;
 };
 
@@ -53,7 +39,7 @@ export const register = async (userData) => {
  * @returns {Promise<Object>} Identity object.
  */
 export const fetchMe = async () => {
-    const response = await apiClient.get('/api/auth/me');
+    const response = await apiClient.get('/auth/me');
     return response.data;
 };
 
@@ -62,7 +48,7 @@ export const fetchMe = async () => {
  * @returns {Promise<Object>} Detailed student profile data, including resume and academic info.
  */
 export const fetchStudentProfile = async () => {
-    const response = await apiClient.get('/api/student/profile');
+    const response = await apiClient.get('/student/profile');
     return response.data;
 };
 
