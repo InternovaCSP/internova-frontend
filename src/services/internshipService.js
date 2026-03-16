@@ -73,6 +73,22 @@ const internshipService = {
             }
             throw error;
         }
+    },
+
+    /**
+     * Updates an existing internship posting.
+     * @param {number} id The internship ID.
+     * @param {Object} internshipData The updated details.
+     * @returns {Promise<Object>} The updated internship.
+     */
+    updateInternship: async (id, internshipData) => {
+        try {
+            const { data } = await api.put(`/internships/${id}`, internshipData);
+            return data;
+        } catch (error) {
+            console.error('Error updating internship:', error);
+            throw error;
+        }
     }
 };
 
