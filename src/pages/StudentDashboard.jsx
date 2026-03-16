@@ -5,6 +5,7 @@ import DashboardWelcomeRow from '../components/dashboard-v2/DashboardWelcomeRow'
 import KpiCardGrid from '../components/dashboard-v2/KpiCardGrid';
 import AnalyticsRow from '../components/dashboard-v2/AnalyticsRow';
 import ActivityAndRecsRow from '../components/dashboard-v2/ActivityAndRecsRow';
+import InternshipPipeline from '../components/InternshipPipeline';
 
 /**
  * StudentDashboard Component (V2)
@@ -52,6 +53,7 @@ export default function StudentDashboard() {
                 ) : (
                     <div className="dash-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                         <DashboardWelcomeRow />
+                        <InternshipPipeline />
                         <KpiCardGrid />
                         <AnalyticsRow />
                         <ActivityAndRecsRow />
