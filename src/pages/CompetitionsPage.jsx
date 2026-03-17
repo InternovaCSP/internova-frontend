@@ -4,7 +4,7 @@ import { Menu, Plus, X, Calendar, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CompetitionsFilterBar from '../components/CompetitionsFilterBar';
 import CompetitionCard from '../components/CompetitionCard';
-import { mockCompetitions } from '../data/mockCompetitions';
+import { competitionApi } from '../services/api';
 
 /**
  * CompetitionsPage Component
@@ -32,12 +32,33 @@ export default function CompetitionsPage() {
 
     // Initial Load
     useEffect(() => {
-        setIsLoading(true);
-        const timer = setTimeout(() => {
-            setCompetitions(mockCompetitions);
-            setIsLoading(false);
-        }, 800);
-        return () => clearTimeout(timer);
+        const fetchCompetitions = async () => {
+            setIsLoading(true);
+            try {
+                const response = await competitionApi.getAll();
+                const mappedData = response.data.map(comp => ({
+                    id: comp.id,
+                    title: comp.title,
+                    organizer: comp.organizerName || 'Unknown Organizer',
+                    description: comp.description || 'No description available.',
+                    category: comp.category || 'General',
+                    status: new Date(comp.endDate) < new Date() ? 'Completed' : 'Upcoming',
+                    eligibility: comp.eligibilityCriteria || 'Open to all students',
+                    startDate: comp.startDate ? new Date(comp.startDate).toLocaleDateString() : 'TBD',
+                    endDate: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
+                    deadline: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
+                    skills: comp.category ? [comp.category] : ['General'], // Fallback since backend lacks skills
+                    currentUserStatus: null // This would come from a participation API if implemented
+                }));
+                setCompetitions(mappedData);
+            } catch (error) {
+                console.error('Failed to fetch competitions:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCompetitions();
     }, []);
 
     // Registration Handler
@@ -90,8 +111,8 @@ export default function CompetitionsPage() {
     }, [competitions, searchQuery, categoryFilter, statusFilter, eligibilityFilter, sortBy]);
 
     const eligibilityOptions = useMemo(() => {
-        return [...new Set(mockCompetitions.map(c => c.eligibility))];
-    }, []);
+        return [...new Set(competitions.map(c => c.eligibility))];
+    }, [competitions]);
 
     return (
         <div className="in-shell">
