@@ -45,7 +45,7 @@ export default function TopNavbar() {
 
                     {/* Left: Logo */}
                     <Link to="/" className="in-navbar-logo" aria-label="InterNova Home">
-                        <span className="in-logo-text">InterNova</span>
+                        <img src="/logo-mono-long.png" alt="InterNova" className="in-navbar-logo-img" />
                     </Link>
 
                     {/* Center: Desktop Links (Hidden on Mobile) */}
