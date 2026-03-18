@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext'
 import internshipService from '../services/internshipService'
-import { Plus, Briefcase, MapPin, Clock, Calendar, CheckCircle, XCircle } from 'lucide-react'
+import Modal from '../components/Modal'
+import { Plus, Briefcase, MapPin, Clock, Calendar, CheckCircle, XCircle, X, FileText, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 
 /**
  * CompanyDashboard Component
@@ -17,23 +20,63 @@ export default function CompanyDashboard() {
     const navigate = useNavigate()
     const [myPostings, setMyPostings] = useState([])
     const [loading, setLoading] = useState(true)
+    const [editingPost, setEditingPost] = useState(null)
+    const [showEditModal, setShowEditModal] = useState(false)
+    const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+
+    const showToast = (message, type = 'success') => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 5000);
+    };
 
     useEffect(() => {
-        async function fetchMyPostings() {
-            try {
-                const data = await internshipService.getCompanyInternships()
-                setMyPostings(data)
-            } catch (error) {
-                console.error('Error loading postings:', error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
         if (user) {
             fetchMyPostings()
         }
     }, [user])
+
+    async function fetchMyPostings() {
+        try {
+            setLoading(true)
+            const data = await internshipService.getCompanyInternships()
+            setMyPostings(data)
+        } catch (error) {
+            console.error('Error loading postings:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleEditClick = (post) => {
+        setEditingPost(post)
+        setShowEditModal(true)
+    }
+
+    const validationSchema = Yup.object().shape({
+        title: Yup.string()
+            .required('Job Title is required')
+            .max(255, 'Title too long'),
+        description: Yup.string()
+            .required('Description is required')
+            .min(20, 'Description should be at least 20 characters'),
+        location: Yup.string().required('Location is required'),
+        duration: Yup.string().required('Duration is required'),
+        requirements: Yup.string().required('Requirements are required')
+    });
+
+    const handleUpdate = async (values, { setSubmitting }) => {
+        try {
+            await internshipService.updateInternship(editingPost.id, values);
+            showToast('Internship updated successfully!');
+            setShowEditModal(false);
+            fetchMyPostings();
+        } catch (error) {
+            console.error('Failed to update internship:', error);
+            alert('Update failed. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     return (
         <div className="dash-v2-layout">
@@ -114,15 +157,11 @@ export default function CompanyDashboard() {
 
                                         <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #f1f5f9', display: 'flex', gap: '12px' }}>
                                             <button 
-                                                className="dash-v2-link" 
-                                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                                                onClick={() => navigate(`/internships?id=${post.id}`)}
+                                                className="in-btn in-btn-outline-azure" 
+                                                style={{ flex: 1, padding: '8px', fontSize: '14px', borderRadius: '10px' }}
+                                                onClick={() => handleEditClick(post)}
                                             >
-                                                View Listing
-                                            </button>
-                                            <span style={{ color: '#e2e8f0' }}>|</span>
-                                            <button className="dash-v2-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: 0.6 }}>
-                                                Edit
+                                                Edit details
                                             </button>
                                         </div>
                                     </div>
@@ -131,6 +170,98 @@ export default function CompanyDashboard() {
                         )}
                     </div>
                 </section>
+
+                {/* Edit Modal Refactored */}
+                <Modal 
+                    isOpen={showEditModal} 
+                    onClose={() => setShowEditModal(false)}
+                    title="Edit Internship Posting"
+                    maxWidth="600px"
+                >
+                    {editingPost && (
+                        <Formik
+                            initialValues={{
+                                title: editingPost.title || '',
+                                description: editingPost.description || '',
+                                location: editingPost.location || '',
+                                duration: editingPost.duration || '',
+                                requirements: editingPost.requirements || '',
+                                isPublished: editingPost.isPublished ?? true
+                            }}
+                            validationSchema={validationSchema}
+                            onSubmit={handleUpdate}
+                        >
+                            {({ isSubmitting }) => (
+                                <Form style={{ display: 'grid', gap: '20px' }}>
+                                    <div className="form-group">
+                                        <label className="form-label">Job Title</label>
+                                        <Field name="title" className="auth-input" placeholder="e.g. Software Intern" />
+                                        <ErrorMessage name="title" component="div" className="form-error" />
+                                    </div>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                        <div className="form-group">
+                                            <label className="form-label">Location</label>
+                                            <Field name="location" className="auth-input" />
+                                            <ErrorMessage name="location" component="div" className="form-error" />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Duration</label>
+                                            <Field name="duration" className="auth-input" />
+                                            <ErrorMessage name="duration" component="div" className="form-error" />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Description</label>
+                                        <Field as="textarea" name="description" className="auth-input" rows="4" style={{ minHeight: '100px' }} />
+                                        <ErrorMessage name="description" component="div" className="form-error" />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Requirements (comma-separated)</label>
+                                        <Field name="requirements" className="auth-input" />
+                                        <ErrorMessage name="requirements" component="div" className="form-error" />
+                                    </div>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px', background: '#f8fafc', borderRadius: '12px' }}>
+                                        <Field type="checkbox" name="isPublished" id="isPublishedEdit" style={{ width: '18px', height: '18px' }} />
+                                        <label htmlFor="isPublishedEdit" style={{ fontSize: '14px', fontWeight: 500, color: '#1e293b', cursor: 'pointer' }}>
+                                            Keep this listing published
+                                        </label>
+                                    </div>
+
+                                    <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                                        <button 
+                                            type="submit" 
+                                            disabled={isSubmitting} 
+                                            className="in-btn in-btn-primary-azure"
+                                            style={{ flex: 1 }}
+                                        >
+                                            {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setShowEditModal(false)} 
+                                            className="in-btn in-btn-outline-teal"
+                                            style={{ flex: 1, border: '1px solid #e2e8f0', color: '#64748b' }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </Form>
+                            )}
+                        </Formik>
+                    )}
+                </Modal>
+
+                {/* Toast Notification */}
+                {toast.show && (
+                    <div className={`pr-toast ${toast.type}`} style={{ zIndex: 2000 }}>
+                        {toast.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                        <span style={{ marginLeft: '8px' }}>{toast.message}</span>
+                    </div>
+                )}
                 
                 <footer style={{ textAlign: 'center', fontSize: '13px', color: '#94a3b8', marginTop: '16px' }}>
                     Industrial data is role-protected and securely managed.

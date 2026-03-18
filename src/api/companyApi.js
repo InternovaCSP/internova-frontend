@@ -19,3 +19,13 @@ export const updateApplicationStatus = async (applicationId, status) => {
     const response = await api.patch(`/applications/${applicationId}/status`, { status });
     return response.data;
 };
+
+/**
+ * Fetches the detailed profile of a student.
+ * @param {number} studentId 
+ * @returns {Promise<Object>} The student profile details.
+ */
+export const fetchStudentProfile = async (studentId) => {
+    const response = await api.get(`/applications/student/${studentId}/profile`);
+    return response.data;
+};
