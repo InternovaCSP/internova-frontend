@@ -89,6 +89,21 @@ const internshipService = {
             console.error('Error updating internship:', error);
             throw error;
         }
+    },
+
+    /**
+     * Deletes an internship posting.
+     * @param {number} id The internship ID.
+     * @returns {Promise<boolean>} Success status.
+     */
+    deleteInternship: async (id) => {
+        try {
+            await api.delete(`/internships/${id}`);
+            return true;
+        } catch (error) {
+            console.error('Error deleting internship:', error);
+            throw error;
+        }
     }
 };
 
