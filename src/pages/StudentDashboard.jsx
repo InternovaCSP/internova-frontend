@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 // Import V2 Dashboard Components
 import DashboardWelcomeRow from '../components/dashboard-v2/DashboardWelcomeRow';
 import KpiCardGrid from '../components/dashboard-v2/KpiCardGrid';
-import AnalyticsRow from '../components/dashboard-v2/AnalyticsRow';
 import ActivityAndRecsRow from '../components/dashboard-v2/ActivityAndRecsRow';
+import InternshipPipeline from '../components/InternshipPipeline';
 
 /**
  * StudentDashboard Component (V2)
@@ -52,8 +52,8 @@ export default function StudentDashboard() {
                 ) : (
                     <div className="dash-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                         <DashboardWelcomeRow />
+                        <InternshipPipeline />
                         <KpiCardGrid />
-                        <AnalyticsRow />
                         <ActivityAndRecsRow />
 
                         <div style={{ textAlign: 'center', fontSize: '13px', color: '#94a3b8', marginTop: '16px' }}>

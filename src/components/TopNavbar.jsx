@@ -28,7 +28,10 @@ export default function TopNavbar() {
     }, [location.pathname]);
 
     // Hide Navbar on Admin pages as they use a custom Sidebar/Header layout
-    if (location.pathname.startsWith('/admin')) {
+    // Also hide on auth pages (login/register) for a clean full-screen experience
+    if (location.pathname.startsWith('/admin') ||
+        location.pathname === '/login' ||
+        location.pathname === '/register') {
         return null;
     }
 
@@ -42,7 +45,7 @@ export default function TopNavbar() {
 
                     {/* Left: Logo */}
                     <Link to="/" className="in-navbar-logo" aria-label="InterNova Home">
-                        <span className="in-logo-text">InterNova</span>
+                        <img src="/logo-mono-long.png" alt="InterNova" className="in-navbar-logo-img" />
                     </Link>
 
                     {/* Center: Desktop Links (Hidden on Mobile) */}

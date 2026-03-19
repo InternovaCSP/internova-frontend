@@ -6,9 +6,12 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import StudentDashboard from './pages/StudentDashboard'
 import CompanyDashboard from './pages/CompanyDashboard'
+import CreateInternshipPage from './pages/CreateInternshipPage'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminCompaniesPage from './pages/AdminCompaniesPage'
 import AdminSettingsPage from './pages/AdminSettingsPage'
+import AdminInternshipsPage from './pages/AdminInternshipsPage'
+import CompanyApplicationsPage from './pages/CompanyApplicationsPage'
 import StudentProfilePage from './pages/StudentProfilePage'
 import NotFound from './pages/NotFound'
 import InternshipsPage from './pages/InternshipsPage'
@@ -65,6 +68,22 @@ function App() {
                     }
                 />
                 <Route
+                    path="/company/create-internship"
+                    element={
+                        <ProtectedRoute allowedRoles={['Company']}>
+                            <CreateInternshipPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/company/applications"
+                    element={
+                        <ProtectedRoute allowedRoles={['Company']}>
+                            <CompanyApplicationsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="/admin/dashboard"
                     element={
                         <ProtectedRoute allowedRoles={['Admin']}>
@@ -77,6 +96,14 @@ function App() {
                     element={
                         <ProtectedRoute allowedRoles={['Admin']}>
                             <AdminCompaniesPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/internships"
+                    element={
+                        <ProtectedRoute allowedRoles={['Admin']}>
+                            <AdminInternshipsPage />
                         </ProtectedRoute>
                     }
                 />

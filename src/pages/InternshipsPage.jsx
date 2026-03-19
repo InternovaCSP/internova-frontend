@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import FiltersBar from '../components/FiltersBar';
 import InternshipCard from '../components/InternshipCard';
 import internshipService from '../services/internshipService';
+import { applyForInternship, fetchMyApplications } from '../api/studentApi';
 import Modal from '../components/Modal';
 
 /**
@@ -32,28 +33,53 @@ const InternshipsPage = () => {
 
     // Load real data from database
     useEffect(() => {
-        const fetchInternships = async () => {
+        const fetchAllData = async () => {
             setIsLoading(true);
             try {
-                const data = await internshipService.getAllInternships();
-                setInternships(data);
+                const [internshipsData, applicationsData] = await Promise.all([
+                    internshipService.getAllInternships(),
+                    user?.role === 'Student' ? fetchMyApplications() : Promise.resolve([])
+                ]);
+
+                // Map applications to internships
+                const apps = Array.isArray(applicationsData) ? applicationsData : (applicationsData?.$values || []);
+                const appliedIds = new Set(apps.map(a => a.internshipId));
+
+                const enhancedInternships = internshipsData.map(i => ({
+                    ...i,
+                    currentUserStatus: appliedIds.has(i.id) ? 'Applied' : null
+                }));
+
+                setInternships(enhancedInternships);
             } catch (error) {
-                console.error('Failed to load internships:', error);
+                console.error('Failed to load data:', error);
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchInternships();
-    }, []);
+        fetchAllData();
+    }, [user]);
 
-    // Handle actions (mock)
-    const handleApply = (id) => {
-        setInternships(prev => prev.map(internship => {
-            if (internship.id === id) {
-                return { ...internship, currentUserStatus: 'Applied' };
-            }
-            return internship;
-        }));
+    // Handle real application submission
+    const handleApply = async (id) => {
+        if (!user || user.role !== 'Student') {
+            alert("Please log in as a student to apply.");
+            return;
+        }
+
+        try {
+            await applyForInternship(id);
+            setInternships(prev => prev.map(internship => {
+                if (internship.id === id) {
+                    return { ...internship, currentUserStatus: 'Applied' };
+                }
+                return internship;
+            }));
+            alert("Application submitted successfully!");
+        } catch (error) {
+            console.error('Failed to apply:', error);
+            alert(error.response?.data?.error || "Failed to submit application.");
+        }
     };
 
     const handleViewDetails = (internship) => {

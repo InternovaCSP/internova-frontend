@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { fetchPendingCompanies, fetchAllCompanies, approveCompany } from '../api/adminApi';
-import { Building2, CheckCircle, AlertCircle, ArrowLeft, Loader2, X, Globe, MapPin, Info, Bell, Search } from 'lucide-react';
+import { fetchPendingCompanies, fetchAllCompanies, approveCompany, fetchCompanyInternships, approveInternship } from '../api/adminApi';
+import { Building2, CheckCircle, AlertCircle, ArrowLeft, Loader2, X, Globe, MapPin, Info, Bell, Search, Briefcase, ExternalLink, ShieldCheck } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 
 /**
@@ -21,6 +21,9 @@ export default function AdminCompaniesPage() {
     const [selectedCompany, setSelectedCompany] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [activeTab, setActiveTab] = useState('pending'); // 'pending' or 'all'
+    const [companyInternships, setCompanyInternships] = useState([]);
+    const [loadingInternships, setLoadingInternships] = useState(false);
+    const [approvingInternshipId, setApprovingInternshipId] = useState(null);
 
     useEffect(() => { loadData(); }, [activeTab]);
 
@@ -44,8 +47,12 @@ export default function AdminCompaniesPage() {
             setProcessingId(companyId);
             await approveCompany(companyId);
             setCompanies(prev => prev.filter(c => (c.companyId || c.CompanyId) !== companyId));
+            if (activeTab === 'all') {
+                // Refresh list if in "all" tab to show updated status
+                loadData();
+            }
             if (selectedCompany && (selectedCompany.companyId || selectedCompany.CompanyId) === companyId) {
-                handleCloseModal();
+                setSelectedCompany({...selectedCompany, status: 'Active', Status: 'Active'});
             }
         } catch (err) {
             console.error(`Failed to approve company ${companyId}:`, err);
@@ -55,14 +62,41 @@ export default function AdminCompaniesPage() {
         }
     };
 
-    const handleOpenModal = (company) => {
+    const handleApproveInternship = async (internshipId) => {
+        try {
+            setApprovingInternshipId(internshipId);
+            await approveInternship(internshipId);
+            setCompanyInternships(prev => prev.map(i => i.id === internshipId ? { ...i, status: 'Active' } : i));
+        } catch (err) {
+            console.error(`Failed to approve internship ${internshipId}:`, err);
+            alert("Internship approval failed.");
+        } finally {
+            setApprovingInternshipId(null);
+        }
+    };
+
+    const handleOpenModal = async (company) => {
         setSelectedCompany(company);
         setShowModal(true);
+        setLoadingInternships(true);
+        try {
+            const data = await fetchCompanyInternships(company.companyId || company.CompanyId);
+            const list = Array.isArray(data) ? data : (data?.$values || []);
+            setCompanyInternships(list);
+        } catch (err) {
+            console.error("Failed to load company internships:", err);
+            setCompanyInternships([]);
+        } finally {
+            setLoadingInternships(false);
+        }
     };
 
     const handleCloseModal = () => {
         setShowModal(false);
-        setTimeout(() => setSelectedCompany(null), 300);
+        setTimeout(() => {
+            setSelectedCompany(null);
+            setCompanyInternships([]);
+        }, 300);
     };
 
     return (
@@ -180,9 +214,10 @@ export default function AdminCompaniesPage() {
                                     const id = company?.companyId || company?.CompanyId || index;
                                     const name = company?.companyName || company?.CompanyName || 'New Company';
                                     const industry = company?.industry || company?.Industry || 'Sector not specified';
-                                    const statusValue = company?.status || company?.Status || 'Pending';
+                                    const statusValue = company?.status ?? company?.Status ?? 'Pending';
                                     const status = String(statusValue);
-                                    const isPending = status.toLowerCase() === 'pending';
+                                    // Fix: Handle both string 'Pending' and integer 0 (if somehow still coming through)
+                                    const isPending = status.toLowerCase() === 'pending' || status === '0';
                                     
                                     return (
                                         <div 
@@ -213,22 +248,22 @@ export default function AdminCompaniesPage() {
                                                 <div>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                         <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 600, color: '#1e293b' }}>{name}</h3>
-                                                        {activeTab === 'all' && (
+                                                        {(activeTab === 'all' || !isPending) && (
                                                             <span style={{ 
                                                                 padding: '4px 10px', 
                                                                 borderRadius: '20px', 
                                                                 fontSize: '11px', 
                                                                 fontWeight: 700, 
                                                                 textTransform: 'uppercase',
-                                                                background: status.toLowerCase() === 'pending' ? '#fffbeb' : '#f0fdf4',
-                                                                color: status.toLowerCase() === 'pending' ? '#b45309' : '#15803d',
-                                                                border: `1px solid ${status.toLowerCase() === 'pending' ? '#fde68a' : '#bbf7d0'}`
+                                                                background: isPending ? '#fffbeb' : '#f0fdf4',
+                                                                color: isPending ? '#b45309' : '#15803d',
+                                                                border: `1px solid ${isPending ? '#fde68a' : '#bbf7d0'}`
                                                             }}>
-                                                                {status}
+                                                                {isPending ? 'Pending' : 'Active'}
                                                             </span>
                                                         )}
                                                     </div>
-                                                    <span style={{ fontSize: '14px', color: '#64748b' }}>{industry}</span>
+                                                    <span style={{ fontSize: '14px', color: '#64748b' }}>{industry === 'Sector not specified' ? 'New registration (stub)' : industry}</span>
                                                 </div>
                                             </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -273,7 +308,7 @@ export default function AdminCompaniesPage() {
                     onClick={handleCloseModal}
                 >
                     <div 
-                        style={{ background: 'white', width: '90%', maxWidth: '650px', borderRadius: '24px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', overflow: 'hidden' }}
+                        style={{ background: 'white', width: '90%', maxWidth: '750px', borderRadius: '24px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}
                         onClick={e => e.stopPropagation()}
                     >
                         <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -283,21 +318,23 @@ export default function AdminCompaniesPage() {
                                 </div>
                                 <div>
                                     <h2 style={{ fontSize: '20px', color: '#1e293b', margin: 0, fontWeight: 700 }}>{selectedCompany.companyName || selectedCompany.CompanyName}</h2>
-                                    <span style={{ fontSize: '14px', color: '#64748b' }}>{selectedCompany.industry || selectedCompany.Industry}</span>
+                                    <span style={{ fontSize: '14px', color: '#64748b' }}>{selectedCompany.industry || selectedCompany.Industry || 'Industry unknown'}</span>
                                 </div>
                             </div>
                             <button style={{ padding: '8px', borderRadius: '50%', border: 'none', background: 'transparent', color: '#94a3b8', cursor: 'pointer' }} onClick={handleCloseModal}><X size={20} /></button>
                         </div>
-                        <div style={{ padding: '32px' }}>
+                        
+                        <div style={{ padding: '32px', overflowY: 'auto', flex: 1 }}>
                             <div style={{ marginBottom: '24px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
                                     <Info size={16} /><span>Description</span>
                                 </div>
                                 <p style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #f1f5f9', color: '#334155', fontSize: '15px', lineHeight: '1.6', margin: 0 }}>
-                                    {selectedCompany.description || selectedCompany.Description || 'No description provided.'}
+                                    {selectedCompany.description || selectedCompany.Description || 'This company has not completed their profile yet. They may have been created automatically during a job posting.'}
                                 </p>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                            
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
                                 <div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
                                         <MapPin size={16} /><span>Location</span>
@@ -317,10 +354,75 @@ export default function AdminCompaniesPage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Internships Section */}
+                            <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '32px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                        <Briefcase size={16} /><span>Job Postings ({companyInternships.length})</span>
+                                    </div>
+                                </div>
+
+                                {loadingInternships ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', padding: '12px' }}>
+                                        <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                                        <span style={{ fontSize: '14px' }}>Loading postings...</span>
+                                    </div>
+                                ) : companyInternships.length === 0 ? (
+                                    <div style={{ padding: '24px', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #e2e8f0', color: '#64748b', fontSize: '14px' }}>
+                                        No internships posted by this company yet.
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'grid', gap: '12px' }}>
+                                        {companyInternships.map(internship => (
+                                            <div key={internship.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
+                                                <div>
+                                                    <h4 style={{ margin: '0 0 4px 0', fontSize: '15px', color: '#1e293b' }}>{internship.title}</h4>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                        <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                            <MapPin size={12} /> {internship.location}
+                                                        </span>
+                                                        <span style={{ 
+                                                            fontSize: '11px', 
+                                                            fontWeight: 700, 
+                                                            textTransform: 'uppercase',
+                                                            color: internship.status === 'Active' ? '#10b981' : '#f59e0b'
+                                                        }}>
+                                                            {internship.status}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                {internship.status !== 'Active' && (
+                                                    <button 
+                                                        onClick={() => handleApproveInternship(internship.id)}
+                                                        disabled={approvingInternshipId === internship.id}
+                                                        style={{ 
+                                                            padding: '6px 12px', 
+                                                            borderRadius: '8px', 
+                                                            background: '#10b981', 
+                                                            color: 'white', 
+                                                            border: 'none', 
+                                                            fontSize: '12px', 
+                                                            fontWeight: 600, 
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '4px'
+                                                        }}
+                                                    >
+                                                        {approvingInternshipId === internship.id ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <><ShieldCheck size={14} /> Approve Job</>}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <div style={{ padding: '24px 32px', background: '#f8fafc', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
+
+                        <div style={{ padding: '24px 32px', background: '#f8fafc', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
                             <button style={{ background: 'transparent', border: 'none', color: '#64748b', fontWeight: 600, cursor: 'pointer', padding: '10px 20px', borderRadius: '10px' }} onClick={handleCloseModal}>Dismiss</button>
-                            {(String(selectedCompany.status || selectedCompany.Status || '').toLowerCase() === 'pending') && (
+                            {(String(selectedCompany.status || selectedCompany.Status || '').toLowerCase() === 'pending' || String(selectedCompany.status || selectedCompany.Status || '') === '0') && (
                                 <button 
                                     style={{ borderRadius: '12px', padding: '12px 24px', fontWeight: 600, background: '#10b981', border: 'none', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} 
                                     onClick={() => handleApprove(selectedCompany.companyId || selectedCompany.CompanyId)} 
