@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext'
 import internshipService from '../services/internshipService'
 import Modal from '../components/Modal'
-import { Plus, Briefcase, MapPin, Clock, Calendar, CheckCircle, XCircle, X, FileText, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Plus, Briefcase, MapPin, Clock, Calendar, CheckCircle, XCircle, X, FileText, Loader2, CheckCircle2, AlertCircle, Trash2 } from 'lucide-react'
 
 /**
  * CompanyDashboard Component
@@ -75,6 +75,19 @@ export default function CompanyDashboard() {
             alert('Update failed. Please try again.');
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleDelete = async (postId) => {
+        if (window.confirm('Are you sure you want to delete this internship posting? All associated applications will also be deleted.')) {
+            try {
+                await internshipService.deleteInternship(postId);
+                showToast('Internship deleted successfully!');
+                setMyPostings(prev => prev.filter(p => p.id !== postId));
+            } catch (error) {
+                console.error('Failed to delete internship:', error);
+                alert('Delete failed. Please try again.');
+            }
         }
     };
 
@@ -162,6 +175,24 @@ export default function CompanyDashboard() {
                                                 onClick={() => handleEditClick(post)}
                                             >
                                                 Edit details
+                                            </button>
+                                            <button 
+                                                className="in-btn" 
+                                                style={{ 
+                                                    padding: '8px', 
+                                                    fontSize: '14px', 
+                                                    borderRadius: '10px', 
+                                                    border: '1px solid #fee2e2', 
+                                                    color: '#ef4444',
+                                                    background: '#fff',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                                onClick={() => handleDelete(post.id)}
+                                                title="Delete posting"
+                                            >
+                                                <Trash2 size={18} />
                                             </button>
                                         </div>
                                     </div>
