@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchCompanyApplications, updateApplicationStatus } from '../api/companyApi';
-import { Loader2, Search, Filter, ArrowLeft, Mail, Calendar, MapPin, CheckCircle, XCircle, Clock, User, Briefcase, ChevronDown } from 'lucide-react';
+import { fetchCompanyApplications, updateApplicationStatus, fetchStudentProfile } from '../api/companyApi';
+import { Loader2, Search, Filter, ArrowLeft, Mail, Calendar, MapPin, CheckCircle, XCircle, Clock, User, Briefcase, ChevronDown, GraduationCap, Award, FileText, X } from 'lucide-react';
 
 export default function CompanyApplicationsPage() {
     const navigate = useNavigate();
@@ -11,6 +11,11 @@ export default function CompanyApplicationsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
     const [processingId, setProcessingId] = useState(null);
+    
+    // Profile Modal State
+    const [selectedStudent, setSelectedStudent] = useState(null);
+    const [profileLoading, setProfileLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => { loadApplications(); }, []);
 
@@ -25,6 +30,21 @@ export default function CompanyApplicationsPage() {
             setError("Could not load applications.");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleViewProfile = async (studentId, studentName) => {
+        try {
+            setProfileLoading(true);
+            setShowModal(true);
+            const profile = await fetchStudentProfile(studentId);
+            setSelectedStudent({ ...profile, name: studentName });
+        } catch (err) {
+            console.error("Failed to load profile:", err);
+            alert("Could not load student profile.");
+            setShowModal(false);
+        } finally {
+            setProfileLoading(false);
         }
     };
 
@@ -173,6 +193,16 @@ export default function CompanyApplicationsPage() {
                                             <Loader2 size={24} className="animate-spin" color="#3b82f6" />
                                         ) : (
                                             <>
+                                                <button 
+                                                    onClick={() => handleViewProfile(app.studentId, app.studentName)}
+                                                    style={{ 
+                                                        padding: '8px 16px', borderRadius: '10px', border: '1px solid #e2e8f0',
+                                                        background: 'white', color: '#64748b', fontWeight: 600, cursor: 'pointer',
+                                                        display: 'flex', alignItems: 'center', gap: '8px'
+                                                    }}
+                                                >
+                                                    <User size={16} /> View Profile
+                                                </button>
                                                 <select 
                                                     value={app.status}
                                                     onChange={(e) => handleStatusUpdate(app.id, e.target.value)}
@@ -197,9 +227,125 @@ export default function CompanyApplicationsPage() {
                 )}
             </div>
 
+            {/* Profile Modal */}
+            {showModal && (
+                <div style={{ 
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+                    background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+                    padding: '24px'
+                }}>
+                    <div style={{ 
+                        background: 'white', borderRadius: '24px', width: '100%', maxWidth: '550px',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', overflow: 'hidden',
+                        animation: 'modalSlideUp 0.3s ease-out'
+                    }}>
+                        {profileLoading ? (
+                            <div style={{ padding: '80px', textAlign: 'center' }}>
+                                <Loader2 size={40} className="animate-spin" color="#3b82f6" style={{ margin: '0 auto' }} />
+                                <p style={{ marginTop: '16px', color: '#64748b', fontWeight: 500 }}>Fetching student details...</p>
+                            </div>
+                        ) : selectedStudent ? (
+                            <>
+                                <div style={{ 
+                                    padding: '32px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                    position: 'relative', color: 'white'
+                                }}>
+                                    <button 
+                                        onClick={() => setShowModal(false)}
+                                        style={{ 
+                                            position: 'absolute', top: '24px', right: '24px', background: 'rgba(255,255,255,0.2)',
+                                            border: 'none', borderRadius: '12px', padding: '8px', cursor: 'pointer', color: 'white'
+                                        }}
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                    
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                        <div style={{ 
+                                            width: '80px', height: '80px', borderRadius: '24px', background: 'rgba(255,255,255,0.2)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)'
+                                        }}>
+                                            <User size={40} />
+                                        </div>
+                                        <div>
+                                            <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>{selectedStudent.name}</h2>
+                                            <p style={{ opacity: 0.9, margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <GraduationCap size={16} /> {selectedStudent.department || 'Not Specified'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ padding: '32px', display: 'grid', gap: '24px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                        <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '16px' }}>
+                                            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 4px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>GPA</p>
+                                            <p style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <Award size={20} color="#eab308" /> {selectedStudent.gpa || 'N/A'}
+                                            </p>
+                                        </div>
+                                        <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '16px' }}>
+                                            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 4px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>University ID</p>
+                                            <p style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', margin: 0 }}>{selectedStudent.universityId || 'N/A'}</p>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <p style={{ fontSize: '14px', color: '#64748b', fontWeight: 600, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <CheckCircle size={16} color="#3b82f6" /> SKILLS & EXPERTISE
+                                        </p>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                            {(selectedStudent.skills || '').split(',').map((skill, i) => (
+                                                <span key={i} style={{ 
+                                                    padding: '6px 12px', background: '#eff6ff', color: '#1d4ed8', 
+                                                    borderRadius: '8px', fontSize: '13px', fontWeight: 500
+                                                }}>
+                                                    {skill.trim()}
+                                                </span>
+                                            ))}
+                                            {!selectedStudent.skills && <span style={{ color: '#94a3b8', fontSize: '14px' }}>No skills listed.</span>}
+                                        </div>
+                                    </div>
+
+                                    {selectedStudent.resumeUrl && (
+                                        <a href={selectedStudent.resumeUrl} target="_blank" rel="noopener noreferrer" style={{ 
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                                            padding: '16px', background: '#0f172a', color: 'white', borderRadius: '16px',
+                                            textDecoration: 'none', fontWeight: 600, transition: 'all 0.2s'
+                                        }}>
+                                            <FileText size={20} /> View Student Resume
+                                        </a>
+                                    )}
+
+                                    <button 
+                                        onClick={() => setShowModal(false)}
+                                        style={{ 
+                                            padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0',
+                                            background: 'white', color: '#64748b', fontWeight: 600, cursor: 'pointer'
+                                        }}
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <div style={{ padding: '60px', textAlign: 'center' }}>
+                                <p style={{ color: '#ef4444' }}>Error loading profile.</p>
+                                <button onClick={() => setShowModal(false)} style={{ marginTop: '16px' }}>Close</button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             <style>{`
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
                 .animate-spin { animation: spin 1s linear infinite; }
+                @keyframes modalSlideUp {
+                    from { transform: translateY(20px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
             `}</style>
         </div>
     );

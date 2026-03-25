@@ -22,4 +22,12 @@ api.interceptors.request.use((config) => {
     return config
 })
 
-export default api
+export const competitionApi = {
+    getAll: () => api.get('/competitions'),
+    getById: (id) => api.get(`/competitions/${id}`),
+    create: (data) => api.post('/competitions', data),
+    update: (id, data) => api.put(`/competitions/${id}`, data),
+    delete: (id) => api.delete(`/competitions/${id}`)
+};
+
+export default api;

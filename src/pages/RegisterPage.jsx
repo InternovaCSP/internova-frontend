@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Building2, GraduationCap, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Building2, GraduationCap, AlertCircle } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
 import { register } from '../api/authApi';
 
@@ -99,12 +99,6 @@ export default function RegisterPage() {
                         >
                             <Building2 size={16} /> Company
                         </div>
-                        <div
-                            className={`role-tab ${role === 'Admin' ? 'active' : ''}`}
-                            onClick={() => { setRole('Admin'); setErrorMsg(''); }}
-                        >
-                            <ShieldCheck size={16} /> Admin
-                        </div>
                     </div>
                 </div>
 
@@ -144,7 +138,7 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="form-group">
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div className="auth-form-grid">
                             <div>
                                 <label className="form-label" htmlFor="password">Password</label>
                                 <div className="pwd-wrapper">
@@ -197,7 +191,7 @@ export default function RegisterPage() {
 
                     {/* Dynamic Fields Section */}
                     <div className={`dynamic-fields ${role === 'Student' ? 'open' : ''}`}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                        <div className="auth-form-grid" style={{ marginBottom: '24px' }}>
                             <div>
                                 <label className="form-label" htmlFor="universityId">Student ID</label>
                                 <input
@@ -229,7 +223,7 @@ export default function RegisterPage() {
                     </div>
 
                     <div className={`dynamic-fields ${role === 'Company' ? 'open' : ''}`}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                        <div className="auth-form-grid" style={{ marginBottom: '24px' }}>
                             <div>
                                 <label className="form-label" htmlFor="companyName">Company Name</label>
                                 <input
@@ -260,26 +254,11 @@ export default function RegisterPage() {
                         </div>
                     </div>
 
-                    <div className={`dynamic-fields ${role === 'Admin' ? 'open' : ''}`}>
-                        <div className="form-group" style={{ marginBottom: '24px' }}>
-                            <label className="form-label" htmlFor="adminKey">Admin Verification Key</label>
-                            <input
-                                type="text"
-                                id="adminKey"
-                                name="adminKey"
-                                className="auth-input"
-                                placeholder="Enter university issued key"
-                            />
-                            <div className="form-error" style={{ color: 'var(--auth-text-sec)', marginTop: '4px', animation: 'none' }}>
-                                Registration locked. Contact IT.
-                            </div>
-                        </div>
-                    </div>
 
                     <button
                         type="submit"
                         className="auth-btn"
-                        disabled={isLoading || role === 'Admin'}
+                        disabled={isLoading}
                     >
                         {isLoading ? <div className="spinner"></div> : "Create Account"}
                     </button>
