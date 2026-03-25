@@ -7,6 +7,7 @@ import NotificationBell from './NotificationBell';
 import UserMenu from './UserMenu';
 import MobileDrawer from './MobileDrawer';
 import { Menu } from 'lucide-react';
+import '../styles/TopNavbar.css';
 
 /**
  * TopNavbar Component
@@ -22,10 +23,18 @@ export default function TopNavbar() {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const location = useLocation();
 
-    // Close mobile menu on route change
+    // Detect if we should use transparent navbar (only on Landing Page at the top)
+    const isLanding = location.pathname === '/';
+    const [isScrolled, setIsScrolled] = useState(false);
+
     useEffect(() => {
-        setIsMobileOpen(false);
-    }, [location.pathname]);
+        if (!isLanding) return;
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isLanding]);
 
     // Hide Navbar on Admin pages as they use a custom Sidebar/Header layout
     // Also hide on auth pages (login/register) for a clean full-screen experience
@@ -36,25 +45,23 @@ export default function TopNavbar() {
     }
 
     return (
-        <header className="in-navbar-wrapper">
+        <header className={`in-navbar-wrapper ${isLanding && !isScrolled ? 'transparent' : ''}`}>
             {/* Accessibility Skip Link */}
             <a href="#main-content" className="in-skip-link">Skip to main content</a>
 
             <nav className="in-navbar">
                 <div className="in-navbar-container">
 
-                    {/* Left: Logo */}
-                    <Link to="/" className="in-navbar-logo" aria-label="InterNova Home">
-                        <img src="/logo-mono-long.png" alt="InterNova" className="in-navbar-logo-img" />
-                    </Link>
+                    {/* Left: Empty space for Grid balance */}
+                    <div />
 
                     {/* Center: Desktop Links (Hidden on Mobile) */}
-                    <div className="in-navbar-center">
+                    <div className="in-navbar-center in-glass-island">
                         <NavLinks />
                     </div>
 
                     {/* Right: Auth/Profile (Hidden on Mobile) */}
-                    <div className="in-navbar-right">
+                    <div className="in-navbar-right in-glass-island">
                         {!user ? (
                             <AuthButtons />
                         ) : (

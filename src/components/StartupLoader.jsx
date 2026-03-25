@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import './StartupLoader.css';
+import '../styles/StartupLoader.css';
 
 export default function StartupLoader() {
     const [isVisible, setIsVisible] = useState(true);
