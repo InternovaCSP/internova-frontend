@@ -7,6 +7,7 @@ import NotificationBell from './NotificationBell';
 import UserMenu from './UserMenu';
 import MobileDrawer from './MobileDrawer';
 import { Menu } from 'lucide-react';
+import '../styles/TopNavbar.css';
 
 /**
  * TopNavbar Component
@@ -51,18 +52,16 @@ export default function TopNavbar() {
             <nav className="in-navbar">
                 <div className="in-navbar-container">
 
-                    {/* Left: Logo */}
-                    <Link to="/" className="in-navbar-logo" aria-label="InterNova Home">
-                        <img src="/logo-mono-long.png" alt="InterNova" className="in-navbar-logo-img" />
-                    </Link>
+                    {/* Left: Empty space for Grid balance */}
+                    <div />
 
                     {/* Center: Desktop Links (Hidden on Mobile) */}
-                    <div className="in-navbar-center">
+                    <div className="in-navbar-center in-glass-island">
                         <NavLinks />
                     </div>
 
                     {/* Right: Auth/Profile (Hidden on Mobile) */}
-                    <div className="in-navbar-right">
+                    <div className="in-navbar-right in-glass-island">
                         {!user ? (
                             <AuthButtons />
                         ) : (
