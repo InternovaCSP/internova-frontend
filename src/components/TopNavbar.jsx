@@ -22,10 +22,18 @@ export default function TopNavbar() {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const location = useLocation();
 
-    // Close mobile menu on route change
+    // Detect if we should use transparent navbar (only on Landing Page at the top)
+    const isLanding = location.pathname === '/';
+    const [isScrolled, setIsScrolled] = useState(false);
+
     useEffect(() => {
-        setIsMobileOpen(false);
-    }, [location.pathname]);
+        if (!isLanding) return;
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isLanding]);
 
     // Hide Navbar on Admin pages as they use a custom Sidebar/Header layout
     // Also hide on auth pages (login/register) for a clean full-screen experience
@@ -36,7 +44,7 @@ export default function TopNavbar() {
     }
 
     return (
-        <header className="in-navbar-wrapper">
+        <header className={`in-navbar-wrapper ${isLanding && !isScrolled ? 'transparent' : ''}`}>
             {/* Accessibility Skip Link */}
             <a href="#main-content" className="in-skip-link">Skip to main content</a>
 
