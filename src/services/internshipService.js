@@ -73,6 +73,37 @@ const internshipService = {
             }
             throw error;
         }
+    },
+
+    /**
+     * Updates an existing internship posting.
+     * @param {number} id The internship ID.
+     * @param {Object} internshipData The updated details.
+     * @returns {Promise<Object>} The updated internship.
+     */
+    updateInternship: async (id, internshipData) => {
+        try {
+            const { data } = await api.put(`/internships/${id}`, internshipData);
+            return data;
+        } catch (error) {
+            console.error('Error updating internship:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Deletes an internship posting.
+     * @param {number} id The internship ID.
+     * @returns {Promise<boolean>} Success status.
+     */
+    deleteInternship: async (id) => {
+        try {
+            await api.delete(`/internships/${id}`);
+            return true;
+        } catch (error) {
+            console.error('Error deleting internship:', error);
+            throw error;
+        }
     }
 };
 
