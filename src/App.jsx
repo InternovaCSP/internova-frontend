@@ -11,6 +11,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminCompaniesPage from './pages/AdminCompaniesPage'
 import AdminSettingsPage from './pages/AdminSettingsPage'
 import AdminInternshipsPage from './pages/AdminInternshipsPage'
+import AdminProjectsPage from './pages/AdminProjectsPage'
 import CompanyApplicationsPage from './pages/CompanyApplicationsPage'
 import StudentProfilePage from './pages/StudentProfilePage'
 import NotFound from './pages/NotFound'
@@ -104,6 +105,14 @@ function App() {
                     element={
                         <ProtectedRoute allowedRoles={['Admin']}>
                             <AdminInternshipsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/projects"
+                    element={
+                        <ProtectedRoute allowedRoles={['Admin']}>
+                            <AdminProjectsPage />
                         </ProtectedRoute>
                     }
                 />

@@ -45,4 +45,14 @@ export const getMyRequests = async () => {
     return response.data;
 };
 
+/**
+ * Delete a project (Admin only).
+ * @param {number} projectId - ID of the project to delete.
+ * @returns {Promise<Object>} Status message.
+ */
+export const deleteProject = async (projectId) => {
+    const response = await apiClient.delete(`/projects/${projectId}`);
+    return response.data;
+};
+
 export default apiClient;
