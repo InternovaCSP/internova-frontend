@@ -4,6 +4,7 @@ import { Menu, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ProjectsFilterBar from '../components/ProjectsFilterBar';
 import ProjectCard from '../components/ProjectCard';
+import ProjectDetailModal from '../components/ProjectDetailModal';
 import { mockProjects } from '../data/mockProjects';
 
 /**
@@ -23,9 +24,10 @@ export default function ProjectsPage() {
 
     // Filter States
     const [searchQuery, setSearchQuery] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState([]);
     const [statusFilter, setStatusFilter] = useState('');
     const [sortBy, setSortBy] = useState('newest');
+    const [selectedProject, setSelectedProject] = useState(null);
 
     // Load mock data with fake delay
     useEffect(() => {
@@ -60,8 +62,8 @@ export default function ProjectsPage() {
             );
         }
 
-        if (categoryFilter) {
-            result = result.filter(item => item.category === categoryFilter);
+        if (categoryFilter.length > 0) {
+            result = result.filter(item => categoryFilter.includes(item.category));
         }
 
         if (statusFilter) {
@@ -134,7 +136,7 @@ export default function ProjectsPage() {
                     </div>
                 ) : (
                     <>
-                        <div className="in-grid-meta">
+                        <div className="prj-grid-meta">
                             <span>Showing {filteredData.length} opportunities</span>
                         </div>
 
@@ -151,11 +153,21 @@ export default function ProjectsPage() {
                                         key={project.id}
                                         project={project}
                                         onRequestJoin={handleRequestJoin}
+                                        onViewDetails={setSelectedProject}
                                     />
                                 ))}
                             </div>
                         )}
                     </>
+                )}
+
+                {/* Detail Modal */}
+                {selectedProject && (
+                    <ProjectDetailModal
+                        project={selectedProject}
+                        onClose={() => setSelectedProject(null)}
+                        onRequestJoin={handleRequestJoin}
+                    />
                 )}
 
             </div>
