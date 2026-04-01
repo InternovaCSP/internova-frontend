@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { getProjects, createProject, deleteProject } from '../api/projectApi';
 import {
     FolderKanban, Plus, Search, Bell, ArrowLeft, Loader2, AlertCircle,
-    CheckCircle, X, Users, Clock, Tag, FileText, ChevronDown, Trash2, Eye
+    CheckCircle, X, Users, Clock, Tag, FileText, ChevronDown, Trash2, Eye,
+    Hash, Wrench
 } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 
@@ -350,11 +351,28 @@ export default function AdminProjectsPage() {
 /* Create Project Modal (inline component)                      */
 /* ──────────────────────────────────────────────────────────── */
 function CreateProjectModal({ onClose, onCreated }) {
-    const [form, setForm] = useState({ title: '', description: '', category: 'Research' });
+    const [form, setForm] = useState({ title: '', description: '', category: 'Research', teamSize: '', requiredSkills: [] });
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState('');
 
     const categories = ['Research', 'Startup', 'Product Development', 'Innovation Lab'];
+
+    const skillOptions = [
+        'React', 'Angular', 'Vue.js', 'Node.js', 'Python', 'Java', 'C#', '.NET',
+        'Machine Learning', 'Data Analysis', 'UI/UX Design', 'Cloud Computing',
+        'DevOps', 'Mobile Development', 'Cybersecurity', 'Blockchain',
+        'Database Management', 'Project Management', 'IoT', 'Embedded Systems'
+    ];
+
+    const toggleSkill = (skill) => {
+        setForm(prev => ({
+            ...prev,
+            requiredSkills: prev.requiredSkills.includes(skill)
+                ? prev.requiredSkills.filter(s => s !== skill)
+                : [...prev.requiredSkills, skill]
+        }));
+        if (formError) setFormError('');
+    };
 
     const handleChange = (field, value) => {
         setForm(prev => ({ ...prev, [field]: value }));
@@ -371,7 +389,9 @@ function CreateProjectModal({ onClose, onCreated }) {
             const created = await createProject({
                 Title: form.title.trim(),
                 Description: form.description.trim(),
-                Category: form.category
+                Category: form.category,
+                TeamSize: form.teamSize ? parseInt(form.teamSize, 10) : null,
+                RequiredSkills: form.requiredSkills.length > 0 ? form.requiredSkills.join(', ') : null
             });
             onCreated(created);
         } catch (err) {
@@ -498,6 +518,60 @@ function CreateProjectModal({ onClose, onCreated }) {
                                 }}
                             />
                         </div>
+                    </div>
+
+                    {/* Team Size */}
+                    <div>
+                        <label style={labelStyle}><Hash size={14} /> Team Size</label>
+                        <input
+                            type="number"
+                            min="1"
+                            value={form.teamSize}
+                            onChange={e => handleChange('teamSize', e.target.value)}
+                            placeholder="e.g., 5"
+                            style={inputStyle}
+                            onFocus={e => e.target.style.borderColor = '#2563eb'}
+                            onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                        />
+                    </div>
+
+                    {/* Required Skills */}
+                    <div>
+                        <label style={labelStyle}><Wrench size={14} /> Required Skills</label>
+                        <div style={{
+                            display: 'flex', flexWrap: 'wrap', gap: '8px',
+                            padding: '12px 16px', borderRadius: '10px',
+                            border: '1px solid #e2e8f0', background: '#fafbfc',
+                            maxHeight: '160px', overflowY: 'auto'
+                        }}>
+                            {skillOptions.map(skill => {
+                                const isSelected = form.requiredSkills.includes(skill);
+                                return (
+                                    <button
+                                        key={skill}
+                                        type="button"
+                                        onClick={() => toggleSkill(skill)}
+                                        style={{
+                                            padding: '5px 14px', borderRadius: '20px',
+                                            fontSize: '12px', fontWeight: 600,
+                                            cursor: 'pointer', transition: 'all 0.15s',
+                                            border: isSelected ? '1.5px solid #2563eb' : '1px solid #e2e8f0',
+                                            background: isSelected ? '#eff6ff' : 'white',
+                                            color: isSelected ? '#2563eb' : '#64748b',
+                                            fontFamily: "'Inter', sans-serif"
+                                        }}
+                                    >
+                                        {isSelected && <CheckCircle size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />}
+                                        {skill}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {form.requiredSkills.length > 0 && (
+                            <p style={{ fontSize: '12px', color: '#64748b', margin: '6px 0 0', fontStyle: 'italic' }}>
+                                {form.requiredSkills.length} skill{form.requiredSkills.length > 1 ? 's' : ''} selected
+                            </p>
+                        )}
                     </div>
 
                     {/* Description */}

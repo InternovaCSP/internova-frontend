@@ -18,7 +18,7 @@ export const getProjects = async (category = '') => {
 
 /**
  * Create a new project.
- * @param {Object} projectData - Payload { Title, Description, Category }.
+ * @param {Object} projectData - Payload { Title, Description, Category, TeamSize?, RequiredSkills? }.
  * @returns {Promise<Object>} Created project response.
  */
 export const createProject = async (projectData) => {
