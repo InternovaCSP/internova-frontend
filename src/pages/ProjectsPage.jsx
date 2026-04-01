@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import ProjectsFilterBar from '../components/ProjectsFilterBar';
 import ProjectCard from '../components/ProjectCard';
 import ProjectDetailModal from '../components/ProjectDetailModal';
-import { mockProjects } from '../data/mockProjects';
+import { getProjects, joinProject, getMyRequests } from '../api/projectApi';
 
 /**
  * ProjectsPage Component
@@ -29,24 +29,61 @@ export default function ProjectsPage() {
     const [sortBy, setSortBy] = useState('newest');
     const [selectedProject, setSelectedProject] = useState(null);
 
-    // Load mock data with fake delay
+    // Load real data from backend
     useEffect(() => {
-        setIsLoading(true);
-        const timer = setTimeout(() => {
-            setProjects(mockProjects);
-            setIsLoading(false);
-        }, 800);
-        return () => clearTimeout(timer);
-    }, []);
+        const fetchAllData = async () => {
+            setIsLoading(true);
+            try {
+                const [projectsData, requestsData] = await Promise.all([
+                    getProjects(),
+                    user?.role === 'Student' ? getMyRequests() : Promise.resolve([])
+                ]);
 
-    // Handle actions (mock)
-    const handleRequestJoin = (id) => {
-        setProjects(prev => prev.map(project => {
-            if (project.id === id) {
-                return { ...project, currentUserStatus: 'Pending' };
+                // Map requests to projects to set current status
+                const requests = Array.isArray(requestsData) ? requestsData : (requestsData?.$values || []);
+                const requestMap = new Map(requests.map(r => [r.projectId, r.status]));
+
+                const enhancedProjects = projectsData.map(p => ({
+                    ...p,
+                    // Map backend fields to frontend expectations if necessary
+                    leaderName: p.creatorName || 'Unknown',
+                    leaderId: p.creatorId,
+                    skills: p.requiredSkills ? p.requiredSkills.split(',').map(s => s.trim()) : [],
+                    availableSlots: p.availableSlots || 0,
+                    teamSize: p.teamSize || 0,
+                    duration: p.duration || 'Flexible',
+                    currentUserStatus: requestMap.get(p.id) || null
+                }));
+
+                setProjects(enhancedProjects);
+            } catch (error) {
+                console.error('Failed to load projects:', error);
+            } finally {
+                setIsLoading(false);
             }
-            return project;
-        }));
+        };
+        fetchAllData();
+    }, [user]);
+
+    // Handle real join request
+    const handleRequestJoin = async (id) => {
+        if (!user || user.role !== 'Student') {
+            alert("Please log in as a student to join a project.");
+            return;
+        }
+
+        try {
+            await joinProject(id);
+            setProjects(prev => prev.map(project => {
+                if (project.id === id) {
+                    return { ...project, currentUserStatus: 'Pending' };
+                }
+                return project;
+            }));
+        } catch (error) {
+            console.error('Failed to join project:', error);
+            alert(error.response?.data?.error || "Failed to send request.");
+        }
     };
 
     // Derived state: Filtered & Sorted Data
