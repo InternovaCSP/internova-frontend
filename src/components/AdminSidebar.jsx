@@ -9,7 +9,8 @@ import {
     Menu,
     X,
     Shield,
-    Briefcase
+    Briefcase,
+    FolderKanban
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -38,6 +39,11 @@ const AdminSidebar = () => {
             name: 'Internship Approvals', 
             icon: <Briefcase size={20} />, 
             path: '/admin/internships' 
+        },
+        { 
+            name: 'Projects', 
+            icon: <FolderKanban size={20} />, 
+            path: '/admin/projects' 
         },
         { 
             name: 'User Management', 
