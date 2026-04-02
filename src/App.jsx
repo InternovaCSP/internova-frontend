@@ -18,6 +18,7 @@ import NotFound from './pages/NotFound'
 import InternshipsPage from './pages/InternshipsPage'
 import ProjectsPage from './pages/ProjectsPage'
 import CompetitionsPage from './pages/CompetitionsPage'
+import SeminarsPage from './pages/SeminarsPage'
 
 /**
  * App Component
@@ -40,6 +41,7 @@ function App() {
                 <Route path="/internships" element={<InternshipsPage />} />
                 <Route path="/projects" element={<ProjectsPage />} />
                 <Route path="/competitions" element={<CompetitionsPage />} />
+                <Route path="/seminars" element={<SeminarsPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
 
