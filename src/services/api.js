@@ -20,4 +20,11 @@ export const competitionApi = {
     delete: (id) => api.delete(`/competitions/${id}`)
 };
 
+export const seminarApi = {
+    getAll: () => api.get('/seminars'),
+    getById: (id) => api.get(`/seminars/${id}`),
+    create: (data) => api.post('/seminars', data),
+    vote: (id) => api.post(`/seminars/${id}/vote`)
+};
+
 export default api;
