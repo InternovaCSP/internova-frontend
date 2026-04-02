@@ -6,6 +6,7 @@ import KpiCardGrid from '../components/dashboard-v2/KpiCardGrid';
 import ActivityAndRecsRow from '../components/dashboard-v2/ActivityAndRecsRow';
 import InternshipPipeline from '../components/InternshipPipeline';
 import ActiveRoomsWidget from '../components/dashboard-v2/ActiveRoomsWidget';
+import UpcomingInterviews from '../components/dashboard-v2/UpcomingInterviews';
 
 /**
  * StudentDashboard Component (V2)
@@ -48,6 +49,7 @@ export default function StudentDashboard() {
                         <div className="dash-v2-analytics-row">
                             <div className="in-skeleton dash-v2-card" style={{ height: '300px' }}></div>
                             <div className="in-skeleton dash-v2-card" style={{ height: '300px' }}></div>
+                            <div className="in-skeleton dash-v2-card" style={{ height: '300px' }}></div>
                         </div>
                     </div>
                 ) : (
@@ -55,6 +57,7 @@ export default function StudentDashboard() {
                         <DashboardWelcomeRow />
                         <ActiveRoomsWidget />
                         <InternshipPipeline />
+                        <UpcomingInterviews />
                         <KpiCardGrid />
                         <ActivityAndRecsRow />
 
