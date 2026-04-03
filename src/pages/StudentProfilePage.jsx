@@ -79,7 +79,18 @@ export default function StudentProfilePage() {
 
     // ─── DIRTY STATE CHECK ────────────────────────────────────────────────────
     useEffect(() => {
-        if (!originalProfile) return;
+        // If profile doesn't exist yet, it's 'dirty' if any field is not empty or a file is selected
+        if (!originalProfile) {
+            const hasStarted = 
+                profile.universityId !== '' || 
+                profile.department !== '' || 
+                profile.gpa !== '' || 
+                profile.skills.length > 0 || 
+                resumeFile !== null;
+            setIsDirty(hasStarted);
+            return;
+        }
+
         const o = originalProfile;
         const isChanged =
             profile.universityId !== o.universityId ||
@@ -142,12 +153,6 @@ export default function StudentProfilePage() {
     const handleSubmit = async () => {
         if (!profile.universityId) {
             showToast('University ID is required', 'error');
-            return;
-        }
-
-        // If no existing resume URL and no file selected, block
-        if (!resumeUrl && !resumeFile) {
-            showToast('A resume file is required for your profile', 'error');
             return;
         }
 
@@ -253,7 +258,7 @@ export default function StudentProfilePage() {
                                 <button
                                     className="pr-btn pr-btn-primary"
                                     onClick={handleSubmit}
-                                    disabled={isSaving || !profile.universityId || (!resumeUrl && !resumeFile) || !isDirty}
+                                    disabled={isSaving || !profile.universityId || !isDirty}
                                 >
                                     {isSaving ? <><Loader2 size={16} className="sp-spinner" /> Saving...</> : 'Save Changes'}
                                 </button>
