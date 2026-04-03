@@ -1,11 +1,10 @@
 import React from 'react';
-import { Users, Clock, CheckCircle2, ChevronRight, Star } from 'lucide-react';
+import { Users, Clock, CheckCircle2, ChevronRight, Star, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export default function ProjectCard({ project, onRequestJoin }) {
+export default function ProjectCard({ project, onRequestJoin, onViewDetails }) {
     const { user } = useAuth();
 
-    // Status tag configurations based on currentUserStatus
     const statusConfig = {
         'Pending': { bg: '#e0f2fe', text: '#0284c7', label: 'Request Pending' },
         'Accepted': { bg: '#dcfce7', text: '#15803d', label: 'Accepted to Project' },
@@ -13,102 +12,100 @@ export default function ProjectCard({ project, onRequestJoin }) {
     };
 
     const currentStatus = statusConfig[project.currentUserStatus];
-
-    // For computing "popularity" or availability
     const isFull = project.availableSlots === 0;
+    const isLeader = user?.userId && project.leaderId && String(user.userId) === String(project.leaderId);
 
     return (
-        <div className="in-card">
+        <div className="prj-card">
 
-            {/* Header */}
-            <div className="in-card-header">
-                <div className="in-card-title-row">
-                    <h3 className="in-card-title">{project.title}</h3>
-                    {project.featured && (
-                        <div className="in-badge in-badge-selected" style={{ padding: '4px 8px', gap: '4px' }}>
-                            <Star size={12} fill="currentColor" /> Featured
-                        </div>
-                    )}
-                </div>
-
-                <div className="in-card-meta">
-                    <span className="in-badge in-badge-active" style={{ backgroundColor: 'transparent', border: '1px solid var(--in-azure)' }}>
+            {/* ── Header ── */}
+            <div className="prj-card-header">
+                <h3 className="prj-card-title">{project.title}</h3>
+                <div className="prj-card-meta">
+                    <span className={`prj-badge prj-badge--${project.category.toLowerCase().replace(/\s+/g, '-')}`}>
                         {project.category}
                     </span>
-                    <span style={{ fontSize: '13px', color: 'var(--in-text-muted)' }}>
-                        Led by {project.leaderName}
-                    </span>
+                    {project.featured && (
+                        <span className="prj-badge prj-badge--featured">
+                            <Star size={11} fill="currentColor" /> Featured
+                        </span>
+                    )}
                 </div>
+                <span className="prj-leader">Led by {project.leaderName}</span>
             </div>
 
-            {/* Body */}
-            <div className="in-card-body">
-                <p className="in-card-desc">{project.description}</p>
+            {/* ── Body ── */}
+            <div className="prj-card-body">
 
                 {/* Skills */}
-                <div className="in-card-tags">
+                <div className="prj-tags">
                     {project.skills.slice(0, 4).map((skill, idx) => (
-                        <span key={idx} className="in-skill-tag">{skill}</span>
+                        <span key={idx} className="prj-skill-tag">{skill}</span>
                     ))}
                     {project.skills.length > 4 && (
-                        <span className="in-skill-tag">+{project.skills.length - 4}</span>
+                        <span className="prj-skill-tag prj-skill-tag--more">+{project.skills.length - 4}</span>
                     )}
                 </div>
 
                 {/* Info Row */}
-                <div className="in-card-info-row">
-                    <div className="in-info-item">
-                        <Users size={16} />
-                        {project.availableSlots} / {project.teamSize} Slots Open
+                <div className="prj-info-row">
+                    <div className="prj-info-item">
+                        <Users size={14} />
+                        <span>{project.availableSlots}/{project.teamSize} slots</span>
                     </div>
-                    <div className="in-info-item">
-                        <Clock size={16} />
-                        {project.duration}
+                    <div className="prj-info-item">
+                        <Clock size={14} />
+                        <span>{project.duration}</span>
                     </div>
-                    <div className="in-info-item" style={{
-                        color: project.status === 'Completed' ? '#b91c1c' : 'var(--in-text-muted)'
-                    }}>
-                        {project.status === 'Completed' ? 'Project Completed' : 'Active Phase'}
+                    <div className={`prj-info-item ${project.status === 'Completed' ? 'prj-info-item--completed' : ''}`}>
+                        <span className={`prj-status-dot ${project.status === 'Active' ? 'prj-status-dot--active' : 'prj-status-dot--done'}`} />
+                        <span>{project.status === 'Completed' ? 'Completed' : 'Active'}</span>
                     </div>
                 </div>
             </div>
 
-            {/* Footer / Actions */}
-            <div className="in-card-footer">
+            {/* ── Footer ── */}
+            <div className="prj-card-footer">
 
-                {/* Left side Status (for students) */}
-                <div className="in-card-status-area">
+                {/* Left: student status */}
+                <div className="prj-footer-left">
                     {user?.role === 'Student' && currentStatus && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 500, color: currentStatus.text, backgroundColor: currentStatus.bg, padding: '4px 10px', borderRadius: '12px' }}>
-                            {project.currentUserStatus === 'Accepted' && <CheckCircle2 size={14} />}
+                        <div className="prj-user-status" style={{ color: currentStatus.text, backgroundColor: currentStatus.bg }}>
+                            {project.currentUserStatus === 'Accepted' && <CheckCircle2 size={13} />}
                             {currentStatus.label}
                         </div>
                     )}
                 </div>
 
-                {/* Right side Actions */}
-                <div className="in-card-actions">
-                    <button className="in-btn in-btn-outline">
-                        View Details
-                    </button>
+                {/* Right: action buttons */}
+                <div className="prj-footer-actions">
+                    <button className="prj-btn prj-btn--outline" onClick={() => onViewDetails(project)}>View Details</button>
 
-                    {user?.role === 'Student' && !project.currentUserStatus && !isFull && project.status === 'Active' && (
-                        <button
-                            className="in-btn in-btn-secondary"
-                            onClick={() => onRequestJoin(project.id)}
-                        >
-                            Request to Join <ChevronRight size={16} />
+                    {isLeader ? (
+                        <button className="prj-btn prj-btn--primary">
+                            <Settings size={14} /> Manage
                         </button>
-                    )}
+                    ) : (
+                        <>
+                            {user?.role === 'Student' && !project.currentUserStatus && !isFull && project.status === 'Active' && (
+                                <button
+                                    className="prj-btn prj-btn--accent"
+                                    onClick={() => onRequestJoin(project.id)}
+                                >
+                                    Request to Join <ChevronRight size={14} />
+                                </button>
+                            )}
 
-                    {isFull && project.status === 'Active' && !project.currentUserStatus && (
-                        <button className="in-btn in-btn-secondary" disabled style={{ opacity: 0.5 }}>
-                            Team Full
-                        </button>
+                            {isFull && project.status === 'Active' && !project.currentUserStatus && (
+                                <button className="prj-btn prj-btn--disabled" disabled>
+                                    Team Full
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
-
             </div>
+
         </div>
     );
 }

@@ -28,6 +28,12 @@ export default function NavLinks({ isMobile }) {
             <NavLink to="/competitions" className={({ isActive }) => `${navClass} ${isActive ? 'active' : ''}`}>
                 Competitions
             </NavLink>
+            <NavLink to="/breakout-rooms" className={({ isActive }) => `${navClass} ${isActive ? 'active' : ''}`}>
+                Breakout Rooms
+            </NavLink>
+            <NavLink to="/seminars" className={({ isActive }) => `${navClass} ${isActive ? 'active' : ''}`}>
+                Seminars
+            </NavLink>
         </>
     );
 }

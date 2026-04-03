@@ -29,3 +29,13 @@ export const fetchStudentProfile = async (studentId) => {
     const response = await api.get(`/applications/student/${studentId}/profile`);
     return response.data;
 };
+
+/**
+ * Schedules an interview for a shortlisted candidate.
+ * @param {Object} data - Contains applicationId, interviewDate, and locationOrLink.
+ * @returns {Promise<Object>} Success response.
+ */
+export const scheduleInterview = async (data) => {
+    const response = await api.post('/interviews/schedule', data);
+    return response.data;
+};

@@ -11,12 +11,15 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminCompaniesPage from './pages/AdminCompaniesPage'
 import AdminSettingsPage from './pages/AdminSettingsPage'
 import AdminInternshipsPage from './pages/AdminInternshipsPage'
+import AdminProjectsPage from './pages/AdminProjectsPage'
 import CompanyApplicationsPage from './pages/CompanyApplicationsPage'
 import StudentProfilePage from './pages/StudentProfilePage'
 import NotFound from './pages/NotFound'
 import InternshipsPage from './pages/InternshipsPage'
 import ProjectsPage from './pages/ProjectsPage'
 import CompetitionsPage from './pages/CompetitionsPage'
+import BreakoutRoomsPage from './pages/BreakoutRoomsPage'
+import SeminarsPage from './pages/SeminarsPage'
 
 /**
  * App Component
@@ -39,6 +42,8 @@ function App() {
                 <Route path="/internships" element={<InternshipsPage />} />
                 <Route path="/projects" element={<ProjectsPage />} />
                 <Route path="/competitions" element={<CompetitionsPage />} />
+                <Route path="/breakout-rooms" element={<BreakoutRoomsPage />} />
+                <Route path="/seminars" element={<SeminarsPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
 
@@ -104,6 +109,14 @@ function App() {
                     element={
                         <ProtectedRoute allowedRoles={['Admin']}>
                             <AdminInternshipsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/projects"
+                    element={
+                        <ProtectedRoute allowedRoles={['Admin']}>
+                            <AdminProjectsPage />
                         </ProtectedRoute>
                     }
                 />
