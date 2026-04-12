@@ -70,11 +70,11 @@ export default function MobileDrawer({ isOpen, onClose, user }) {
                             <Link to={`/${user.role?.toLowerCase() || 'student'}/dashboard`} className="in-mobile-link" onClick={onClose}>
                                 Dashboard
                             </Link>
-                            <Link to="/notifications" className="in-mobile-link" onClick={onClose}>
-                                Notifications
-                            </Link>
-                            <Link to={`/${user.role?.toLowerCase() || 'student'}/profile`} className="in-mobile-link" onClick={onClose}>
+                            <Link to="/profile" className="in-mobile-link" onClick={onClose}>
                                 Profile
+                            </Link>
+                            <Link to="/settings" className="in-mobile-link" onClick={onClose}>
+                                Settings
                             </Link>
                             <button className="in-mobile-link in-logout-link" onClick={handleLogout}>
                                 Logout
