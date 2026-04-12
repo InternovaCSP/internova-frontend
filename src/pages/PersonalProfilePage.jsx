@@ -1,18 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { fetchProfile, updateProfile } from '../api/authApi';
+import { fetchProfile, updateProfile, updateStudentProfile } from '../api/authApi';
 import {
     User, Mail, MapPin, Camera, 
     Save, CheckCircle2, AlertCircle, 
-    Loader2, FileText, GraduationCap
+    Loader2, FileText, GraduationCap,
+    X, Upload, Plus, Briefcase
 } from 'lucide-react';
 import '../styles/TopNavbar.css';
 
 /**
  * PersonalProfilePage Component
  * 
- * Integrated with the C# backend. Combines personal identity settings
- * with academic performance tracking. 
+ * Unified and polished interface for Personal and Academic profile management.
+ * Uses a grid-based layout for better space utilization and premium aesthetics.
  */
 export default function PersonalProfilePage() {
     const { user: authUser } = useAuth();
@@ -31,6 +32,8 @@ export default function PersonalProfilePage() {
     });
 
     const [academicProfile, setAcademicProfile] = useState(null);
+    const [resumeFile, setResumeFile] = useState(null);
+    const [tagInputValue, setTagInputValue] = useState('');
 
     // ─── STATE: UI ────────────────────────────────────────────────────────────
     const [isLoading, setIsLoading] = useState(true);
@@ -40,177 +43,233 @@ export default function PersonalProfilePage() {
 
     // ─── REFS ─────────────────────────────────────────────────────────────────
     const fileInputRef = useRef(null);
+    const resumeInputRef = useRef(null);
+    const tagInputRef = useRef(null);
 
     // ─── LIFECYCLE ────────────────────────────────────────────────────────────
     useEffect(() => {
         loadProfileData();
     }, []);
 
+    // Proactive initialization for Students to prevent infinite loader
+    useEffect(() => {
+        if (!academicProfile && (authUser?.role?.toLowerCase() === 'student')) {
+            setAcademicProfile({
+                universityId: '',
+                department: '',
+                gpa: '',
+                skills: [],
+                resumeUrl: null
+            });
+        }
+    }, [authUser, academicProfile]);
+
     const loadProfileData = async () => {
         setIsLoading(true);
         try {
             const data = await fetchProfile();
+            
             setPersonalInfo({
-                fullName: data.fullName || '',
-                bio: data.bio || '',
-                location: data.location || '',
-                email: data.email || '',
-                profilePictureUrl: data.profilePictureUrl || null,
-                previewUrl: data.profilePictureUrl || null,
+                fullName: data.fullName || data.FullName || '',
+                bio: data.bio || data.Bio || '',
+                location: data.location || data.Location || '',
+                email: data.email || data.Email || '',
+                profilePictureUrl: data.profilePictureUrl || data.ProfilePictureUrl || null,
+                previewUrl: data.profilePictureUrl || data.ProfilePictureUrl || null,
                 file: null
             });
 
-            if (data.academicProfile) {
-                setAcademicProfile(data.academicProfile);
+            const rawRole = data.role || data.Role || authUser?.role || '';
+            const isStudent = rawRole.toLowerCase() === 'student';
+
+            if (isStudent) {
+                const ac = data.academicProfile || data.AcademicProfile;
+                setAcademicProfile({
+                    universityId: ac?.universityId || ac?.UniversityId || '',
+                    department: ac?.department || ac?.Department || '',
+                    gpa: ac?.gpa !== undefined ? ac.gpa : (ac?.GPA !== undefined ? ac.GPA : ''),
+                    skills: (ac?.skills || ac?.Skills) 
+                        ? String(ac.skills || ac.Skills).split(',').map(s => s.trim()).filter(Boolean) 
+                        : [],
+                    resumeUrl: ac?.resumeUrl || ac?.ResumeUrl || null
+                });
             }
         } catch (error) {
-            showToast('Failed to load profile data', 'error');
-            console.error(error);
+            console.error("Profile load failed:", error);
+            showToast('Unable to load profile', 'error');
         } finally {
             setIsLoading(false);
         }
     };
 
     // ─── HANDLERS ─────────────────────────────────────────────────────────────
-    const handleInputChange = (e) => {
+    const showToast = (message, type) => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 4000);
+    };
+
+    const handlePersonalChange = (e) => {
         const { name, value } = e.target;
         setPersonalInfo(prev => ({ ...prev, [name]: value }));
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     };
 
-    const handleImageChange = (e) => {
+    const handleAvatarChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
-        if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
-            showToast('Only JPG/PNG images are accepted', 'error');
-            return;
-        }
-
-        if (file.size > 5 * 1024 * 1024) {
-            showToast('File must be under 5MB', 'error');
-            return;
-        }
-
-        setPersonalInfo(prev => ({ 
-            ...prev, 
-            file, 
-            previewUrl: URL.createObjectURL(file) 
-        }));
+        setPersonalInfo(prev => ({ ...prev, file, previewUrl: URL.createObjectURL(file) }));
     };
 
     const handleSavePersonal = async () => {
-        if (!personalInfo.fullName.trim()) {
-            setErrors({ fullName: 'Name is required' });
-            return;
-        }
-
+        if (!personalInfo.fullName.trim()) { setErrors({ fullName: 'Required' }); return; }
         setIsSaving(true);
         try {
             const formData = new FormData();
             formData.append('FullName', personalInfo.fullName.trim());
             formData.append('Bio', personalInfo.bio || '');
             formData.append('Location', personalInfo.location || '');
-            
-            if (personalInfo.file) {
-                formData.append('ProfilePicture', personalInfo.file);
-            }
+            if (personalInfo.file) formData.append('ProfilePicture', personalInfo.file);
 
             const result = await updateProfile(formData);
-            
-            // Sync local state with backend response
-            setPersonalInfo(prev => ({
-                ...prev,
-                profilePictureUrl: result.profilePictureUrl,
-                file: null
-            }));
-            
+            setPersonalInfo(prev => ({ ...prev, profilePictureUrl: result.profilePictureUrl, file: null }));
             setIsEditMode(false);
-            showToast('Profile updated successfully!', 'success');
+            showToast('Personal info saved!', 'success');
         } catch (error) {
-            showToast(error.response?.data?.error || 'Failed to update profile', 'error');
+            showToast('Update failed', 'error');
         } finally {
             setIsSaving(false);
         }
     };
 
-    const showToast = (message, type) => {
-        setToast({ show: true, message, type });
-        setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 4000);
+    const handleAcademicChange = (field, value) => {
+        setAcademicProfile(prev => ({ ...prev, [field]: value }));
     };
 
-    // ─── RENDER HELPERS ───────────────────────────────────────────────────────
+    const handleTagKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const tag = tagInputValue.trim();
+            if (tag && !academicProfile.skills.includes(tag)) {
+                setAcademicProfile(prev => ({ ...prev, skills: [...prev.skills, tag] }));
+                setTagInputValue('');
+            }
+        }
+    };
+
+    const removeTag = (idx) => {
+        setAcademicProfile(prev => ({ ...prev, skills: prev.skills.filter((_, i) => i !== idx) }));
+    };
+
+    const handleSaveAcademic = async () => {
+        if (!academicProfile.universityId.trim()) { showToast('Uni ID required', 'error'); return; }
+        setIsSaving(true);
+        try {
+            const formData = new FormData();
+            formData.append('UniversityId', academicProfile.universityId.trim());
+            formData.append('Department', academicProfile.department || '');
+            formData.append('GPA', academicProfile.gpa || '0');
+            formData.append('Skills', academicProfile.skills.join(', '));
+            if (resumeFile) formData.append('resume', resumeFile);
+
+            const result = await updateStudentProfile(formData);
+            setAcademicProfile(prev => ({ ...prev, resumeUrl: result.resumeUrl }));
+            setResumeFile(null);
+            setIsEditMode(false);
+            showToast('Academic info saved!', 'success');
+        } catch (error) {
+            showToast('Update failed', 'error');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    // ─── RENDER ───────────────────────────────────────────────────────────────
     if (isLoading) {
-        return (
-            <div className="pr-shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
-                <Loader2 size={40} className="sp-spinner" style={{ color: '#6c63ff' }} />
-            </div>
-        );
+        return <div className="pr-shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}><Loader2 size={40} className="sp-spinner" style={{ color: '#6c63ff' }} /></div>;
     }
 
+    const currentRole = authUser?.role?.toLowerCase() || '';
+
     return (
-        <div className="pr-shell pr-animate-fade" style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '60px' }}>
+        <div className="pr-shell" style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px' }}>
             {/* Toast Notification */}
             {toast.show && (
-                <div className={`pr-toast ${toast.type}`} style={{ zIndex: 1000 }}>
+                <div className={`pr-toast ${toast.type}`} style={{ zIndex: 1000, position: 'fixed', top: '24px', right: '24px', animation: 'slideIn 0.3s ease-out' }}>
                     {toast.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                     {toast.message}
                 </div>
             )}
 
-            {/* Premium Header Container */}
-            <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', paddingTop: '40px' }}>
+            {/* Premium Header Section */}
+            <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', paddingTop: '60px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
                 <div className="pr-container">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
-                        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+                        <div style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
                             <div style={{ position: 'relative' }}>
-                                <div className="pr-avatar" style={{ width: '100px', height: '100px', fontSize: '32px', border: '4px solid white', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                <div className="pr-avatar" style={{ 
+                                    width: '120px', 
+                                    height: '120px', 
+                                    fontSize: '40px', 
+                                    border: '6px solid white', 
+                                    boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+                                    background: '#0f172a',
+                                    color: 'white',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderRadius: '50%',
+                                    fontWeight: 700
+                                }}>
                                     {personalInfo.previewUrl ? (
-                                        <img src={personalInfo.previewUrl} alt="Profile" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                        <img src={personalInfo.previewUrl} alt="P" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                                     ) : (
                                         personalInfo.fullName.charAt(0).toUpperCase()
                                     )}
                                 </div>
-                                {isEditMode && (
+                                {isEditMode && activeTab === 'personal' && (
                                     <button 
                                         onClick={() => fileInputRef.current?.click()}
                                         style={{ 
-                                            position: 'absolute', bottom: '0', right: '0', 
-                                            background: '#6c63ff', color: 'white', border: 'none', 
-                                            borderRadius: '50%', width: '32px', height: '32px', 
+                                            position: 'absolute', bottom: '4px', right: '4px', 
+                                            background: '#6c63ff', color: 'white', border: '3px solid white', 
+                                            borderRadius: '50%', width: '36px', height: '36px', 
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+                                            cursor: 'pointer', boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                                         }}
                                     >
-                                        <Camera size={16} />
+                                        <Camera size={18} />
                                     </button>
                                 )}
-                                <input type="file" ref={fileInputRef} onChange={handleImageChange} style={{ display: 'none' }} accept="image/*" />
+                                <input type="file" ref={fileInputRef} onChange={handleAvatarChange} style={{ display: 'none' }} accept="image/*" />
                             </div>
-                            <div>
-                                <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#0f172a', margin: 0 }}>{personalInfo.fullName}</h1>
-                                <p style={{ color: '#64748b', fontSize: '16px', margin: '4px 0 0' }}>{authUser?.role || 'Member'} • {personalInfo.location || 'Unknown Location'}</p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.5px' }}>{personalInfo.fullName}</h1>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#64748b', fontSize: '15px' }}>
+                                    <span style={{ background: '#f1f5f9', padding: '4px 12px', borderRadius: '20px', fontWeight: 600, color: '#6c63ff', fontSize: '12px', textTransform: 'uppercase' }}>{authUser?.role || 'Member'}</span>
+                                    {personalInfo.location && (
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <MapPin size={14} /> {personalInfo.location}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
                         <div style={{ display: 'flex', gap: '12px' }}>
                             {!isEditMode ? (
-                                <button 
-                                    className="pr-btn pr-btn-primary" 
-                                    onClick={() => setIsEditMode(true)}
-                                    style={{ background: '#6c63ff', padding: '10px 24px' }}
-                                >
-                                    Edit Profile
+                                <button className="pr-btn pr-btn-primary" onClick={() => setIsEditMode(true)} style={{ height: '46px', padding: '0 28px' }}>
+                                    Edit {activeTab === 'personal' ? 'Personal' : 'Academic'}
                                 </button>
                             ) : (
                                 <>
                                     <button className="pr-btn pr-btn-ghost" onClick={() => setIsEditMode(false)} disabled={isSaving}>Cancel</button>
                                     <button 
                                         className="pr-btn pr-btn-primary" 
-                                        onClick={handleSavePersonal}
+                                        onClick={activeTab === 'personal' ? handleSavePersonal : handleSaveAcademic} 
                                         disabled={isSaving}
+                                        style={{ height: '46px', padding: '0 28px' }}
                                     >
-                                        {isSaving ? <Loader2 size={16} className="sp-spinner" /> : <Save size={16} />}
+                                        {isSaving ? <Loader2 size={18} className="sp-spinner" /> : <Save size={18} />}
                                         Save Changes
                                     </button>
                                 </>
@@ -218,29 +277,29 @@ export default function PersonalProfilePage() {
                         </div>
                     </div>
 
-                    {/* Tabs Navigation */}
-                    <div style={{ display: 'flex', gap: '32px' }}>
+                    {/* Tab Navigation */}
+                    <div style={{ display: 'flex', gap: '40px' }}>
                         <button 
-                            onClick={() => setActiveTab('personal')}
+                            onClick={() => { setActiveTab('personal'); setIsEditMode(false); }} 
                             style={{ 
-                                padding: '12px 4px', border: 'none', background: 'transparent',
-                                fontSize: '15px', fontWeight: 600, cursor: 'pointer',
-                                color: activeTab === 'personal' ? '#6c63ff' : '#64748b',
-                                borderBottom: activeTab === 'personal' ? '2px solid #6c63ff' : '2px solid transparent',
-                                transition: 'all 0.2s'
+                                padding: '16px 4px', border: 'none', background: 'transparent', 
+                                fontWeight: 700, fontSize: '15px', cursor: 'pointer',
+                                color: activeTab === 'personal' ? '#6c63ff' : '#64748b', 
+                                borderBottom: activeTab === 'personal' ? '3px solid #6c63ff' : '3px solid transparent',
+                                transition: 'all 0.2s ease'
                             }}
                         >
                             Personal Details
                         </button>
-                        {authUser?.role === 'Student' && academicProfile && (
+                        {currentRole === 'student' && (
                             <button 
-                                onClick={() => setActiveTab('academic')}
+                                onClick={() => { setActiveTab('academic'); setIsEditMode(false); }} 
                                 style={{ 
-                                    padding: '12px 4px', border: 'none', background: 'transparent',
-                                    fontSize: '15px', fontWeight: 600, cursor: 'pointer',
-                                    color: activeTab === 'academic' ? '#6c63ff' : '#64748b',
-                                    borderBottom: activeTab === 'academic' ? '2px solid #6c63ff' : '2px solid transparent',
-                                    transition: 'all 0.2s'
+                                    padding: '16px 4px', border: 'none', background: 'transparent', 
+                                    fontWeight: 700, fontSize: '15px', cursor: 'pointer',
+                                    color: activeTab === 'academic' ? '#6c63ff' : '#64748b', 
+                                    borderBottom: activeTab === 'academic' ? '3px solid #6c63ff' : '3px solid transparent',
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
                                 Academic Profile
@@ -251,77 +310,65 @@ export default function PersonalProfilePage() {
             </div>
 
             {/* Main Content Area */}
-            <div className="pr-container" style={{ marginTop: '32px' }}>
-                <div style={{ maxWidth: '800px' }}>
+            <div className="pr-container" style={{ marginTop: '40px' }}>
+                <div style={{ maxWidth: '900px' }}>
                     
+                    {/* PERSONAL TAB */}
                     {activeTab === 'personal' && (
-                        <div className="pr-animate-fade" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            <div className="pr-editor-card" style={{ padding: '32px' }}>
-                                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <User size={20} color="#6c63ff" />
-                                    About Me
-                                </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                            <div className="pr-editor-card" style={{ padding: '40px', borderRadius: '24px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.04)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
+                                    <div style={{ background: 'rgba(108, 99, 255, 0.1)', padding: '10px', borderRadius: '12px' }}>
+                                        <User size={24} color="#6c63ff" />
+                                    </div>
+                                    <h3 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: '#0f172a' }}>Public Identity</h3>
+                                </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '32px' }}>
                                     <div className="pr-field">
                                         <label className="pr-label">Full Name</label>
                                         {isEditMode ? (
-                                            <>
-                                                <input 
-                                                    name="fullName"
-                                                    value={personalInfo.fullName} 
-                                                    onChange={handleInputChange}
-                                                    className={`pr-input ${errors.fullName ? 'error' : ''}`} 
-                                                />
-                                                {errors.fullName && <span className="pr-error-text">{errors.fullName}</span>}
-                                            </>
+                                            <input name="fullName" value={personalInfo.fullName} onChange={handlePersonalChange} className="pr-input" style={{ height: '48px' }} />
                                         ) : (
-                                            <div style={{ padding: '10px 0', fontSize: '15px', fontWeight: 500 }}>{personalInfo.fullName}</div>
+                                            <div style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', padding: '8px 0' }}>{personalInfo.fullName}</div>
                                         )}
                                     </div>
                                     <div className="pr-field">
                                         <label className="pr-label">Email Address</label>
-                                        <div style={{ padding: '10px 0', fontSize: '15px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '16px', fontWeight: 500, padding: '8px 0' }}>
                                             <Mail size={16} />
                                             {personalInfo.email}
                                         </div>
                                     </div>
+                                    <div className="pr-field">
+                                        <label className="pr-label">Location</label>
+                                        {isEditMode ? (
+                                            <div style={{ position: 'relative' }}>
+                                                <MapPin size={18} style={{ position: 'absolute', left: '12px', top: '15px', color: '#94a3b8' }} />
+                                                <input name="location" value={personalInfo.location} onChange={handlePersonalChange} className="pr-input" style={{ paddingLeft: '40px', height: '48px' }} placeholder="City, Country" />
+                                            </div>
+                                        ) : (
+                                            <div style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', padding: '8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <MapPin size={18} color="#6c63ff" />
+                                                {personalInfo.location || 'Not Specified'}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="pr-field">
+                                        <label className="pr-label">Work Preferences</label>
+                                        <div style={{ fontSize: '14px', color: '#64748b', padding: '8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <Briefcase size={16} /> Ready for Opportunities
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="pr-field" style={{ marginTop: '24px' }}>
-                                    <label className="pr-label">Location</label>
+                                <div className="pr-field" style={{ marginTop: '32px' }}>
+                                    <label className="pr-label">Professional Bio</label>
                                     {isEditMode ? (
-                                        <div style={{ position: 'relative' }}>
-                                            <MapPin size={16} style={{ position: 'absolute', left: '12px', top: '14px', color: '#94a3b8' }} />
-                                            <input 
-                                                name="location"
-                                                value={personalInfo.location} 
-                                                onChange={handleInputChange}
-                                                className="pr-input" 
-                                                style={{ paddingLeft: '40px' }}
-                                            />
-                                        </div>
+                                        <textarea name="bio" value={personalInfo.bio} onChange={handlePersonalChange} className="pr-input" style={{ minHeight: '140px', padding: '16px', lineHeight: '1.6' }} placeholder="Write a brief introduction about yourself..." />
                                     ) : (
-                                        <div style={{ padding: '10px 0', fontSize: '15px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <MapPin size={16} color="#6c63ff" />
-                                            {personalInfo.location || 'Not specified'}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="pr-field" style={{ marginTop: '24px' }}>
-                                    <label className="pr-label">Bio</label>
-                                    {isEditMode ? (
-                                        <textarea 
-                                            name="bio"
-                                            value={personalInfo.bio} 
-                                            onChange={handleInputChange}
-                                            className="pr-input" 
-                                            style={{ minHeight: '120px', resize: 'vertical', paddingTop: '12px' }}
-                                        />
-                                    ) : (
-                                        <p style={{ margin: 0, fontSize: '15px', lineHeight: '1.6', color: '#334155' }}>
-                                            {personalInfo.bio || 'No bio provided.'}
+                                        <p style={{ margin: 0, fontSize: '16px', lineHeight: '1.8', color: '#475569', maxWidth: '100%' }}>
+                                            {personalInfo.bio || 'Tell the world who you are. Add a bio to help employers find you!'}
                                         </p>
                                     )}
                                 </div>
@@ -329,77 +376,145 @@ export default function PersonalProfilePage() {
                         </div>
                     )}
 
-                    {activeTab === 'academic' && academicProfile && (
-                        <div className="pr-animate-fade" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            <div className="pr-editor-card" style={{ padding: '32px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                                    <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <GraduationCap size={20} color="#6c63ff" />
-                                        University Information
-                                    </h3>
-                                    <button 
-                                        className="pr-btn pr-btn-ghost" 
-                                        style={{ fontSize: '13px', padding: '6px 12px' }}
-                                        onClick={() => window.location.href = '/student/profile'}
-                                    >
-                                        Edit Full Academic Profile
-                                    </button>
+                    {/* ACADEMIC TAB */}
+                    {activeTab === 'academic' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                            <div className="pr-editor-card" style={{ padding: '40px', borderRadius: '24px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.04)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
+                                    <div style={{ background: 'rgba(108, 99, 255, 0.1)', padding: '10px', borderRadius: '12px' }}>
+                                        <GraduationCap size={24} color="#6c63ff" />
+                                    </div>
+                                    <h3 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: '#0f172a' }}>Academic Records</h3>
                                 </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                        <div>
-                                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase' }}>University ID</span>
-                                            <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginTop: '4px' }}>{academicProfile.universityId || 'Not set'}</div>
-                                        </div>
-                                        <div>
-                                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase' }}>Department</span>
-                                            <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginTop: '4px' }}>{academicProfile.department || 'Not set'}</div>
-                                        </div>
-                                        <div>
-                                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase' }}>Current GPA</span>
-                                            <div style={{ marginTop: '8px' }}>
-                                                <span className="pr-stat-value-badge" style={{ fontSize: '15px', padding: '6px 12px' }}>{academicProfile.gpa ? `${academicProfile.gpa} / 4.00` : '—'}</span>
+                                {!academicProfile ? (
+                                    <div style={{ display: 'flex', justifyContent: 'center', padding: '60px' }}><Loader2 className="sp-spinner" size={32} color="#6c63ff" /></div>
+                                ) : (
+                                    <>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '32px' }}>
+                                            <div className="pr-field">
+                                                <label className="pr-label">University ID</label>
+                                                {isEditMode ? (
+                                                    <input value={academicProfile.universityId} onChange={e => handleAcademicChange('universityId', e.target.value)} className="pr-input" style={{ height: '48px' }} placeholder="e.g. STU-12345" />
+                                                ) : (
+                                                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', padding: '8px 0' }}>{academicProfile.universityId || 'Not Set'}</div>
+                                                )}
+                                            </div>
+                                            <div className="pr-field">
+                                                <label className="pr-label">Department / Major</label>
+                                                {isEditMode ? (
+                                                    <input value={academicProfile.department} onChange={e => handleAcademicChange('department', e.target.value)} className="pr-input" style={{ height: '48px' }} placeholder="e.g. Computer Science" />
+                                                ) : (
+                                                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', padding: '8px 0' }}>{academicProfile.department || 'Not Set'}</div>
+                                                )}
+                                            </div>
+                                            <div className="pr-field">
+                                                <label className="pr-label">Cumulative GPA</label>
+                                                {isEditMode ? (
+                                                    <input type="number" step="0.01" value={academicProfile.gpa} onChange={e => handleAcademicChange('gpa', e.target.value)} className="pr-input" style={{ height: '48px' }} placeholder="0.00" />
+                                                ) : (
+                                                    <div style={{ padding: '8px 0' }}>
+                                                        <span className="pr-stat-value-badge" style={{ fontSize: '16px', background: '#6c63ff', color: 'white', padding: '6px 14px' }}>
+                                                            {academicProfile.gpa ? `${academicProfile.gpa} / 4.00` : '—'}
+                                                        </span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div>
-                                        <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase' }}>Core Skills</span>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
-                                            {academicProfile.skills ? (
-                                                academicProfile.skills.split(',').map((skill, idx) => (
-                                                    <span key={idx} className="pr-tag" style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#475569' }}>{skill.trim()}</span>
-                                                ))
+                                        <div className="pr-field" style={{ marginTop: '40px' }}>
+                                            <label className="pr-label">Technical Skillset</label>
+                                            {isEditMode ? (
+                                                <div style={{ marginTop: '12px' }}>
+                                                    <div className="pr-tags-wrap" style={{ padding: '12px', minHeight: '100px', backgroundColor: '#fcfcfe', border: '1.5px dashed #e2e8f0' }} onClick={() => tagInputRef.current?.focus()}>
+                                                        {academicProfile.skills.map((s, i) => (
+                                                            <div key={i} className="pr-tag" style={{ background: '#6c63ff', color: 'white', borderRadius: '8px', padding: '6px 14px' }}>
+                                                                {s}
+                                                                <X size={14} onClick={() => removeTag(i)} style={{ marginLeft: '8px', cursor: 'pointer' }} />
+                                                            </div>
+                                                        ))}
+                                                        <input ref={tagInputRef} value={tagInputValue} onChange={e => setTagInputValue(e.target.value)} onKeyDown={handleTagKeyDown} placeholder="Press Enter to add skill..." className="pr-tag-input" />
+                                                    </div>
+                                                </div>
                                             ) : (
-                                                <span style={{ fontSize: '14px', fontStyle: 'italic', color: '#94a3b8' }}>No skills listed</span>
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '16px' }}>
+                                                    {academicProfile.skills.length > 0 ? (
+                                                        academicProfile.skills.map((s, i) => (
+                                                            <span key={i} className="pr-tag" style={{ background: '#f1f5f9', color: '#475569', fontWeight: 600, padding: '8px 16px', border: '1px solid #e2e8f0' }}>{s}</span>
+                                                        ))
+                                                    ) : (
+                                                        <span style={{ fontStyle: 'italic', color: '#94a3b8' }}>No skills listed. Build your career by adding some!</span>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
-                                    </div>
-                                </div>
 
-                                <div style={{ marginTop: '32px', padding: '20px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ background: 'white', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                                <FileText size={20} color="#64748b" />
-                                            </div>
-                                            <div>
-                                                <div style={{ fontSize: '14px', fontWeight: 600 }}>Curriculum Vitae / Resume</div>
-                                                <div style={{ fontSize: '12px', color: '#94a3b8' }}>{academicProfile.resumeUrl ? 'Verified Document Attached' : 'No document uploaded'}</div>
+                                        <div className="pr-field" style={{ marginTop: '40px' }}>
+                                            <label className="pr-label">Curriculum Vitae / Resume</label>
+                                            <div style={{ 
+                                                marginTop: '16px', 
+                                                padding: '32px', 
+                                                background: '#f8fafc', 
+                                                borderRadius: '20px', 
+                                                border: '2px dashed #e2e8f0',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '16px',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseEnter={e => e.currentTarget.style.borderColor = '#6c63ff'}
+                                            onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+                                            >
+                                                <div style={{ background: 'white', padding: '16px', borderRadius: '50%', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                                                    <FileText size={40} color={resumeFile || academicProfile.resumeUrl ? "#6c63ff" : "#94a3b8"} />
+                                                </div>
+                                                <div style={{ textAlign: 'center' }}>
+                                                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
+                                                        {resumeFile ? resumeFile.name : (academicProfile.resumeUrl ? 'Verified Resume.pdf' : 'No Document Uploaded')}
+                                                    </div>
+                                                    <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+                                                        {resumeFile ? 'Ready for synchronization' : (academicProfile.resumeUrl ? 'Last updated recently' : 'Upload your PDF resume to qualify for internships.')}
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ marginTop: '8px' }}>
+                                                    {isEditMode ? (
+                                                        <button onClick={() => resumeInputRef.current?.click()} className="pr-btn pr-btn-primary" style={{ background: '#6c63ff', height: '40px', fontSize: '13px' }}>
+                                                            {resumeFile ? 'Replace Selection' : 'Upload Resume (PDF)'}
+                                                        </button>
+                                                    ) : academicProfile.resumeUrl && (
+                                                        <a href={academicProfile.resumeUrl} target="_blank" rel="noreferrer" className="pr-btn pr-btn-ghost" style={{ backgroundColor: 'white', color: '#6c63ff', border: '1px solid #e2e8f0' }}>
+                                                            View Document
+                                                        </a>
+                                                    )}
+                                                </div>
+                                                <input type="file" ref={resumeInputRef} onChange={e => setResumeFile(e.target.files[0])} style={{ display: 'none' }} accept=".pdf" />
                                             </div>
                                         </div>
-                                        {academicProfile.resumeUrl && (
-                                            <a href={academicProfile.resumeUrl} target="_blank" rel="noreferrer" style={{ fontSize: '13px', fontWeight: 600, color: '#6c63ff', textDecoration: 'none' }}>View Resume</a>
-                                        )}
-                                    </div>
-                                </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     )}
-
                 </div>
             </div>
+            
+            <style>{`
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                .pr-input:focus {
+                    border-color: #6c63ff !important;
+                    box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.1) !important;
+                    outline: none;
+                }
+                .pr-btn:active {
+                    transform: scale(0.98);
+                }
+            `}</style>
         </div>
     );
 }
