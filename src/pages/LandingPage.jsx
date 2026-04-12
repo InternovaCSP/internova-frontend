@@ -44,19 +44,18 @@ export default function LandingPage() {
                     </div>
 
                     <div className="lp-dash-preview">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
-                            <div style={{ height: '12px', width: '100px', background: 'var(--lp-slate)', borderRadius: '6px' }}></div>
-                            <div style={{ height: '12px', width: '40px', background: 'rgba(0, 112, 243, 0.1)', borderRadius: '6px' }}></div>
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-                            <div style={{ height: '80px', background: 'var(--lp-gray)', borderRadius: '16px', border: '1px solid var(--lp-border)' }}></div>
-                            <div style={{ height: '80px', background: 'var(--lp-gray)', borderRadius: '16px', border: '1px solid var(--lp-border)' }}></div>
-                        </div>
-                        <div style={{ height: '140px', background: 'linear-gradient(180deg, var(--lp-gray) 0%, transparent 100%)', borderRadius: '16px', border: '1px solid var(--lp-border)', padding: '16px' }}>
-                            <div style={{ height: '8px', width: '60%', background: 'var(--lp-slate)', borderRadius: '4px', marginBottom: '12px' }}></div>
-                            <div style={{ height: '8px', width: '40%', background: 'var(--lp-gray)', borderRadius: '4px' }}></div>
-                        </div>
+                        <video 
+                            className="lp-dash-video"
+                            autoPlay 
+                            loop 
+                            muted 
+                            playsInline
+                        >
+                            <source src="/video.mp4" type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
+
                 </div>
             </section>
 
