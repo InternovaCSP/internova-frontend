@@ -15,6 +15,7 @@ import AdminProjectsPage from './pages/AdminProjectsPage'
 import CompanyApplicationsPage from './pages/CompanyApplicationsPage'
 import StudentProfilePage from './pages/StudentProfilePage'
 import SettingsPage from './pages/SettingsPage'
+import PersonalProfilePage from './pages/PersonalProfilePage'
 import NotFound from './pages/NotFound'
 import InternshipsPage from './pages/InternshipsPage'
 import ProjectsPage from './pages/ProjectsPage'
@@ -54,14 +55,6 @@ function App() {
                     element={
                         <ProtectedRoute allowedRoles={['Student']}>
                             <StudentDashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/student/profile"
-                    element={
-                        <ProtectedRoute allowedRoles={['Student']}>
-                            <StudentProfilePage />
                         </ProtectedRoute>
                     }
                 />
@@ -126,6 +119,13 @@ function App() {
                     element={
                         <ProtectedRoute allowedRoles={['Admin']}>
                             <AdminSettingsPage />
+                        </ProtectedRoute>
+                    }
+                />                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute allowedRoles={['Student', 'Company', 'Admin']}>
+                            <PersonalProfilePage />
                         </ProtectedRoute>
                     }
                 />

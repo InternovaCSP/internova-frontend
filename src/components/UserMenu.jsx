@@ -55,7 +55,7 @@ export default function UserMenu({ user }) {
 
             {isOpen && (
                 <div className="in-nav-dropdown in-user-dropdown">
-                    <Link to={`/${role.toLowerCase()}/profile`} className="in-dropdown-item" onClick={() => setIsOpen(false)}>
+                    <Link to="/profile" className="in-dropdown-item" onClick={() => setIsOpen(false)}>
                         Profile
                     </Link>
                     <Link to="/settings" className="in-dropdown-item" onClick={() => setIsOpen(false)}>
