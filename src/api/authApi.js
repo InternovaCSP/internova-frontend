@@ -52,4 +52,23 @@ export const fetchStudentProfile = async () => {
     return response.data;
 };
 
+/**
+ * Fetches the unified user profile (Personal + Academic).
+ */
+export const fetchProfile = async () => {
+    const response = await apiClient.get('/profile');
+    return response.data;
+};
+
+/**
+ * Updates the personal profile details.
+ * @param {FormData} formData - Contains FullName, Bio, Location, and ProfilePicture.
+ */
+export const updateProfile = async (formData) => {
+    const response = await apiClient.put('/profile', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+};
+
 export default apiClient;
