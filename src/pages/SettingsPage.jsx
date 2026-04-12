@@ -131,10 +131,10 @@ export default function SettingsPage() {
                     <h2 className="in-settings-title">Settings</h2>
                     <nav>
                         {[
-                            { id: 'appearance', label: 'Appearance', icon: <Sun size={18} /> },
-                            { id: 'notifications', label: 'Notifications', icon: <Bell size={18} /> },
-                            { id: 'security', label: 'Security', icon: <Lock size={18} /> },
-                            { id: 'account', label: 'Account', icon: <Trash2 size={18} /> }
+                            { id: 'appearance', label: 'Appearance', icon: <Sun size={16} /> },
+                            { id: 'notifications', label: 'Notifications', icon: <Bell size={16} /> },
+                            { id: 'security', label: 'Security', icon: <Lock size={16} /> },
+                            { id: 'account', label: 'Account', icon: <Trash2 size={16} /> }
                         ].map(tab => (
                             <button 
                                 key={tab.id}
@@ -154,13 +154,13 @@ export default function SettingsPage() {
                     {/* Feedback Alerts */}
                     {saved && (
                         <div className="in-alert in-alert-success">
-                            <CheckCircle2 size={18} />
+                            <CheckCircle2 size={16} />
                             <span>Changes saved successfully.</span>
                         </div>
                     )}
                     {error && (
                         <div className="in-alert in-alert-danger">
-                            <AlertTriangle size={18} />
+                            <AlertTriangle size={16} />
                             <span>{error}</span>
                         </div>
                     )}
@@ -175,9 +175,9 @@ export default function SettingsPage() {
 
                             <div className="in-theme-grid">
                                 {[
-                                    { id: 'light', label: 'Light Mode', icon: <Sun size={24} /> },
-                                    { id: 'dark', label: 'Dark Mode', icon: <Moon size={24} /> },
-                                    { id: 'system', label: 'System Default', icon: <Monitor size={24} /> }
+                                    { id: 'light', label: 'Light Mode', icon: <Sun size={20} /> },
+                                    { id: 'dark', label: 'Dark Mode', icon: <Moon size={20} /> },
+                                    { id: 'system', label: 'System Default', icon: <Monitor size={20} /> }
                                 ].map(option => (
                                     <button 
                                         key={option.id}
@@ -192,7 +192,7 @@ export default function SettingsPage() {
                             
                             <div className="in-section-footer">
                                 <button className="in-save-btn" onClick={handleSavePreferences} disabled={loading}>
-                                    {loading ? 'Saving...' : <><Save size={18} /> Save Preferences</>}
+                                    {loading ? 'Saving...' : <><Save size={16} /> Save Preferences</>}
                                 </button>
                             </div>
                         </section>
@@ -209,10 +209,10 @@ export default function SettingsPage() {
                             <div className="in-toggle-list">
                                 <div className="in-toggle-item">
                                     <div className="in-toggle-text">
-                                        <div className="in-icon-wrap"><Mail size={20} /></div>
+                                        <div className="in-icon-wrap"><Mail size={18} /></div>
                                         <div>
                                             <h4>Email Notifications</h4>
-                                            <p>Receive updates about applications, interviews, and system alerts via email.</p>
+                                            <p>Receive updates via email.</p>
                                         </div>
                                     </div>
                                     <label className="in-switch">
@@ -227,10 +227,10 @@ export default function SettingsPage() {
 
                                 <div className="in-toggle-item">
                                     <div className="in-toggle-text">
-                                        <div className="in-icon-wrap"><Bell size={20} /></div>
+                                        <div className="in-icon-wrap"><Bell size={18} /></div>
                                         <div>
                                             <h4>Browser Notifications</h4>
-                                            <p>Push alerts on your desktop when someone interacts with your profile.</p>
+                                            <p>Push alerts on your desktop.</p>
                                         </div>
                                     </div>
                                     <label className="in-switch">
@@ -246,7 +246,7 @@ export default function SettingsPage() {
 
                             <div className="in-section-footer">
                                 <button className="in-save-btn" onClick={handleSavePreferences} disabled={loading}>
-                                    {loading ? 'Saving...' : <><Save size={18} /> Save Settings</>}
+                                    {loading ? 'Saving...' : <><Save size={16} /> Save Settings</>}
                                 </button>
                             </div>
                         </section>
@@ -257,7 +257,7 @@ export default function SettingsPage() {
                         <section className="in-settings-section fade-in">
                             <div className="in-section-header">
                                 <h3>Security</h3>
-                                <p>Manage your account password and security settings.</p>
+                                <p>Manage your account password.</p>
                             </div>
 
                             <form onSubmit={handleChangePassword} className="in-settings-form">
@@ -279,7 +279,7 @@ export default function SettingsPage() {
                                             required 
                                             value={pwd.new}
                                             onChange={e => setPwd({...pwd, new: e.target.value})}
-                                            placeholder="at least 8 characters"
+                                            placeholder="at least 8 chars"
                                         />
                                     </div>
                                     <div className="in-form-group">
@@ -289,12 +289,12 @@ export default function SettingsPage() {
                                             required 
                                             value={pwd.confirm}
                                             onChange={e => setPwd({...pwd, confirm: e.target.value})}
-                                            placeholder="repeat new password"
+                                            placeholder="repeat password"
                                         />
                                     </div>
                                 </div>
                                 <button type="submit" className="in-save-btn" disabled={loading}>
-                                    {loading ? 'Updating...' : <><ShieldCheck size={18} /> Update Password</>}
+                                    {loading ? 'Updating...' : <><ShieldCheck size={16} /> Update Password</>}
                                 </button>
                             </form>
                         </section>
@@ -305,13 +305,13 @@ export default function SettingsPage() {
                         <section className="in-settings-section fade-in">
                             <div className="in-section-header">
                                 <h3>Account Management</h3>
-                                <p>Manage your data and account status.</p>
+                                <p>Manage your data and status.</p>
                             </div>
 
                             <div className="in-danger-zone">
                                 <div className="in-danger-text">
                                     <h4>Delete Account</h4>
-                                    <p>Once you delete your account, there is no going back. All your data including applications, projects, and profile info will be permanently removed.</p>
+                                    <p>Irreversible action. Permanently removes all your data.</p>
                                 </div>
                                 <button 
                                     className="in-delete-btn"
@@ -330,17 +330,17 @@ export default function SettingsPage() {
                 <div className="in-modal-overlay">
                     <div className="in-modal-content">
                         <div className="in-modal-header">
-                            <div className="in-modal-icon-danger"><Trash2 size={24} /></div>
-                            <button onClick={() => setIsDeleteModalOpen(false)} className="in-modal-close"><X size={20} /></button>
+                            <div className="in-modal-icon-danger"><Trash2 size={20} /></div>
+                            <button onClick={() => setIsDeleteModalOpen(false)} className="in-modal-close"><X size={18} /></button>
                         </div>
                         <div className="in-modal-body">
                             <h3>Are you absolutely sure?</h3>
-                            <p>This action cannot be undone. This will permanently delete your account (<strong>{user?.email}</strong>) and remove your data from our servers.</p>
+                            <p>This will permanently delete your account (<strong>{user?.email}</strong>).</p>
                         </div>
                         <div className="in-modal-footer">
                             <button className="in-btn-secondary" onClick={() => setIsDeleteModalOpen(false)}>Cancel</button>
                             <button className="in-btn-danger" onClick={handleDeleteAccount} disabled={loading}>
-                                {loading ? 'Deleting...' : 'Yes, Delete My Account'}
+                                {loading ? 'Deleting...' : 'Yes, Delete'}
                             </button>
                         </div>
                     </div>
@@ -349,108 +349,112 @@ export default function SettingsPage() {
 
             <style>{`
                 .in-settings-container {
-                    max-width: 1200px;
-                    margin: 40px auto;
-                    padding: 0 20px;
+                    max-width: 900px;
+                    margin: 100px auto 40px;
+                    padding: 0 24px;
                     font-family: 'Inter', sans-serif;
                 }
                 .in-settings-grid {
                     display: grid;
-                    grid-template-columns: 280px 1fr;
-                    gap: 40px;
+                    grid-template-columns: 220px 1fr;
+                    min-height: 500px;
                     background: var(--app-surface);
                     border-radius: 20px;
                     overflow: hidden;
-                    box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+                    box-shadow: 0 15px 40px rgba(0,0,0,0.05);
                     border: 1px solid var(--app-border);
                 }
                 .in-settings-tabs {
-                    padding: 40px;
-                    background: rgba(var(--app-primary), 0.02);
+                    padding: 32px 20px;
+                    background: rgba(108, 99, 255, 0.02);
                     border-right: 1px solid var(--app-border);
                 }
                 .in-settings-title {
-                    font-size: 24px;
+                    font-size: 18px;
                     font-weight: 800;
-                    margin-bottom: 32px;
+                    margin-bottom: 24px;
                     color: var(--app-text);
+                    padding-left: 8px;
                 }
                 .in-settings-tabs nav {
                     display: flex;
                     flex-direction: column;
-                    gap: 8px;
+                    gap: 4px;
                 }
                 .in-tab-btn {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
-                    padding: 12px 16px;
+                    gap: 10px;
+                    padding: 10px 14px;
                     border: none;
                     background: transparent;
                     color: var(--app-muted);
                     font-weight: 600;
-                    font-size: 15px;
+                    font-size: 13px;
                     border-radius: 10px;
                     cursor: pointer;
-                    transition: all 0.2s;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                     text-align: left;
                 }
                 .in-tab-btn:hover {
                     background: var(--app-border);
                     color: var(--app-text);
+                    transform: translateX(2px);
                 }
                 .in-tab-btn.active {
                     background: var(--app-primary);
                     color: white;
+                    box-shadow: 0 4px 10px rgba(108, 99, 255, 0.15);
                 }
                 .in-settings-content {
-                    padding: 40px;
-                    min-height: 500px;
+                    padding: 32px;
+                    background: var(--app-bg);
                 }
                 .in-section-header {
-                    margin-bottom: 32px;
+                    margin-bottom: 24px;
                 }
                 .in-section-header h3 {
-                    font-size: 20px;
+                    font-size: 18px;
                     font-weight: 700;
-                    margin-bottom: 8px;
+                    margin-bottom: 4px;
+                    color: var(--app-text);
                 }
                 .in-section-header p {
                     color: var(--app-muted);
-                    font-size: 14px;
+                    font-size: 13px;
                 }
                 .in-theme-grid {
                     display: grid;
                     grid-template-columns: repeat(3, 1fr);
-                    gap: 20px;
-                    margin-bottom: 32px;
+                    gap: 12px;
+                    margin-bottom: 28px;
                 }
                 .in-theme-card {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    gap: 16px;
-                    padding: 24px;
+                    gap: 8px;
+                    padding: 16px;
                     background: var(--app-bg);
-                    border: 2px solid var(--app-border);
-                    border-radius: 16px;
+                    border: 1px solid var(--app-border);
+                    border-radius: 12px;
                     cursor: pointer;
-                    transition: all 0.2s;
+                    transition: all 0.2s ease;
                     color: var(--app-text);
                 }
                 .in-theme-card:hover {
                     border-color: var(--app-primary);
-                    background: rgba(108, 99, 255, 0.05);
+                    background: rgba(108, 99, 255, 0.02);
                 }
                 .in-theme-card.active {
                     border-color: var(--app-primary);
-                    background: rgba(108, 99, 255, 0.1);
-                    box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.1);
+                    background: rgba(108, 99, 255, 0.04);
+                    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.08);
                 }
                 .in-theme-icon {
-                    width: 56px;
-                    height: 56px;
-                    border-radius: 14px;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 10px;
                     background: var(--app-surface);
                     display: flex;
                     align-items: center;
@@ -459,33 +463,33 @@ export default function SettingsPage() {
                 }
                 .in-theme-card span {
                     font-weight: 600;
-                    font-size: 14px;
+                    font-size: 12px;
                 }
                 .in-toggle-list {
                     display: flex;
                     flex-direction: column;
-                    gap: 24px;
-                    margin-bottom: 32px;
+                    gap: 12px;
+                    margin-bottom: 24px;
                 }
                 .in-toggle-item {
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    padding: 20px;
-                    background: var(--app-bg);
+                    padding: 16px 20px;
+                    background: var(--app-surface);
                     border-radius: 16px;
                     border: 1px solid var(--app-border);
                 }
                 .in-toggle-text {
                     display: flex;
-                    gap: 16px;
+                    gap: 12px;
                     max-width: 80%;
                 }
                 .in-icon-wrap {
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 10px;
-                    background: var(--app-surface);
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
+                    background: var(--app-bg);
                     color: var(--app-primary);
                     display: flex;
                     align-items: center;
@@ -493,184 +497,123 @@ export default function SettingsPage() {
                     flex-shrink: 0;
                 }
                 .in-toggle-text h4 {
-                    font-size: 15px;
+                    font-size: 14px;
                     font-weight: 600;
-                    margin-bottom: 4px;
                 }
                 .in-toggle-text p {
-                    font-size: 13px;
+                    font-size: 12px;
                     color: var(--app-muted);
-                    line-height: 1.5;
                 }
                 /* Switch Style */
                 .in-switch {
                     position: relative;
                     display: inline-block;
-                    width: 50px;
-                    height: 26px;
+                    width: 40px;
+                    height: 20px;
                 }
                 .in-switch input { opacity: 0; width: 0; height: 0; }
                 .in-slider {
                     position: absolute;
                     cursor: pointer;
                     top: 0; left: 0; right: 0; bottom: 0;
-                    background-color: #cbd5e1;
+                    background-color: #e2e8f0;
                     transition: .4s;
-                    border-radius: 34px;
+                    border-radius: 20px;
                 }
                 .in-slider:before {
                     position: absolute;
                     content: "";
-                    height: 18px; width: 18px;
-                    left: 4px; bottom: 4px;
+                    height: 14px; width: 14px;
+                    left: 3px; bottom: 3px;
                     background-color: white;
                     transition: .4s;
                     border-radius: 50%;
                 }
                 input:checked + .in-slider { background-color: var(--app-primary); }
-                input:checked + .in-slider:before { transform: translateX(24px); }
+                input:checked + .in-slider:before { transform: translateX(20px); }
 
                 .in-save-btn {
                     background: var(--app-primary);
                     color: white;
                     border: none;
-                    padding: 12px 24px;
+                    padding: 10px 20px;
                     border-radius: 10px;
                     font-weight: 700;
-                    font-size: 15px;
+                    font-size: 13px;
                     cursor: pointer;
                     display: flex;
                     align-items: center;
                     gap: 8px;
                     transition: all 0.2s;
                 }
-                .in-save-btn:hover { background: #5a52d9; transform: translateY(-1px); }
-                .in-save-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+                .in-save-btn:hover { background: #5a52d9; }
 
                 .in-settings-form {
                     display: flex;
                     flex-direction: column;
-                    gap: 24px;
+                    gap: 16px;
                 }
                 .in-form-row {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
-                    gap: 20px;
+                    gap: 16px;
                 }
                 .in-form-group {
                     display: flex;
                     flex-direction: column;
-                    gap: 8px;
+                    gap: 6px;
                 }
                 .in-form-group label {
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: 600;
                     color: var(--app-text);
+                    padding-left: 2px;
                 }
                 .in-form-group input {
-                    padding: 12px 16px;
+                    padding: 10px 14px;
                     border-radius: 10px;
                     border: 1px solid var(--app-border);
-                    background: var(--app-bg);
+                    background: var(--app-surface);
                     color: var(--app-text);
-                    font-size: 14px;
+                    font-size: 13px;
                     outline: none;
-                    transition: border-color 0.2s;
                 }
                 .in-form-group input:focus { border-color: var(--app-primary); }
 
                 .in-danger-zone {
-                    padding: 32px;
-                    background: rgba(239, 68, 68, 0.03);
-                    border: 1px solid rgba(239, 68, 68, 0.2);
+                    padding: 24px;
+                    background: rgba(239, 68, 68, 0.015);
+                    border: 1px dashed rgba(239, 68, 68, 0.2);
                     border-radius: 16px;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    gap: 32px;
+                    gap: 24px;
                 }
-                .in-danger-text h4 { color: var(--app-danger); font-weight: 700; margin-bottom: 8px; }
-                .in-danger-text p { font-size: 14px; color: var(--app-muted); line-height: 1.5; }
+                .in-danger-text h4 { color: var(--app-danger); font-size: 16px; }
+                .in-danger-text p { font-size: 12px; color: var(--app-muted); }
                 .in-delete-btn {
-                    padding: 12px 24px;
-                    background: white;
+                    padding: 10px 18px;
+                    background: var(--app-bg);
                     color: var(--app-danger);
                     border: 1px solid var(--app-danger);
                     border-radius: 10px;
                     font-weight: 700;
+                    font-size: 12px;
                     cursor: pointer;
-                    transition: all 0.2s;
-                    flex-shrink: 0;
                 }
-                .in-delete-btn:hover { background: var(--app-danger); color: white; }
-
-                /* Alerts */
-                .in-alert {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    padding: 16px 20px;
-                    border-radius: 12px;
-                    margin-bottom: 24px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    animation: slideDown 0.3s ease;
-                }
-                .in-alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-                .in-alert-danger { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
 
                 /* Modal */
-                .in-modal-overlay {
-                    position: fixed;
-                    top: 0; left: 0; right: 0; bottom: 0;
-                    background: rgba(0,0,0,0.5);
-                    backdrop-filter: blur(4px);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1000;
-                    animation: fadeIn 0.2s ease;
-                }
                 .in-modal-content {
-                    background: var(--app-bg);
-                    width: 100%;
-                    max-width: 500px;
-                    border-radius: 24px;
-                    padding: 32px;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-                    position: relative;
+                    max-width: 400px;
+                    padding: 24px;
+                    border-radius: 20px;
                 }
-                .in-modal-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-start;
-                    margin-bottom: 24px;
-                }
-                .in-modal-icon-danger {
-                    width: 56px;
-                    height: 56px;
-                    border-radius: 16px;
-                    background: #fee2e2;
-                    color: #ef4444;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .in-modal-close {
-                    background: transparent;
-                    border: none;
-                    color: var(--app-muted);
-                    cursor: pointer;
-                }
-                .in-modal-body h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
-                .in-modal-body p { color: var(--app-muted); font-size: 15px; margin-bottom: 32px; line-height: 1.6; }
-                .in-modal-footer { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-                .in-btn-secondary { background: var(--app-surface); color: var(--app-text); border: 1px solid var(--app-border); padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-                .in-btn-danger { background: var(--app-danger); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-
-                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-                @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-                .fade-in { animation: fadeIn 0.4s ease; }
+                .in-modal-icon-danger { width: 48px; height: 48px; border-radius: 14px; }
+                .in-modal-body h3 { font-size: 18px; }
+                .in-modal-body p { font-size: 13px; margin-bottom: 24px; }
+                .in-modal-footer { gap: 12px; }
+                .in-btn-secondary, .in-btn-danger { padding: 10px; font-size: 13px; border-radius: 10px; }
             `}</style>
         </div>
     );
