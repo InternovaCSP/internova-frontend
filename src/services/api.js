@@ -27,4 +27,14 @@ export const seminarApi = {
     vote: (id) => api.post(`/seminars/${id}/vote`)
 };
 
+export const userSettingsApi = {
+    get: () => api.get('/settings'),
+    update: (data) => api.put('/settings', data)
+};
+
+export const authManagementApi = {
+    changePassword: (data) => api.post('/auth/change-password', data),
+    deleteAccount: () => api.delete('/auth/account')
+};
+
 export default api;

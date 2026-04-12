@@ -14,6 +14,14 @@
 }
 
 :root {
+  --app-bg: #ffffff;
+  --app-text: #0f172a;
+  --app-surface: #f8fafc;
+  --app-border: #e2e8f0;
+  --app-muted: #64748b;
+  --app-primary: #6c63ff;
+  --app-danger: #ef4444;
+  
   --bg: #0f111a;
   --surface: #1a1d2e;
   --surface2: #232742;
@@ -29,6 +37,14 @@
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+.dark {
+  --app-bg: #0f172a;
+  --app-text: #f1f5f9;
+  --app-surface: #1e293b;
+  --app-border: #334155;
+  --app-muted: #94a3b8;
+}
+
 html,
 body,
 #root {
@@ -36,10 +52,11 @@ body,
 }
 
 body {
-  background: #ffffff; /* Updated to pure white to blend with the transparent navbar and page backgrounds */
-  color: #0f172a; /* Updated default text color for light theme */
+  background: var(--app-bg);
+  color: var(--app-text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* ═══════════════════════════════════════════════════════
