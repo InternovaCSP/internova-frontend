@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
+import { NotificationProvider } from './context/NotificationContext'
 import TopNavbar from './components/TopNavbar'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
@@ -21,6 +22,7 @@ import ProjectsPage from './pages/ProjectsPage'
 import CompetitionsPage from './pages/CompetitionsPage'
 import BreakoutRoomsPage from './pages/BreakoutRoomsPage'
 import SeminarsPage from './pages/SeminarsPage'
+import NotificationsPage from './pages/NotificationsPage'
 
 /**
  * App Component
@@ -35,7 +37,7 @@ import SeminarsPage from './pages/SeminarsPage'
  */
 function App() {
     return (
-        <>
+        <NotificationProvider>
             <TopNavbar />
             <Routes>
                 {/* Public */}
@@ -136,13 +138,20 @@ function App() {
                             <SettingsPage />
                         </ProtectedRoute>
                     }
+                />                <Route
+                    path="/notifications"
+                    element={
+                        <ProtectedRoute allowedRoles={['Student', 'Company', 'Admin']}>
+                            <NotificationsPage />
+                        </ProtectedRoute>
+                    }
                 />
 
 
                 {/* Catch-all */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
-        </>
+        </NotificationProvider>
     )
 }
 
