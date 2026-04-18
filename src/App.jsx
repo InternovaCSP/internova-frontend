@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
+import { NotificationProvider } from './context/NotificationContext'
 import TopNavbar from './components/TopNavbar'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
@@ -13,13 +14,15 @@ import AdminSettingsPage from './pages/AdminSettingsPage'
 import AdminInternshipsPage from './pages/AdminInternshipsPage'
 import AdminProjectsPage from './pages/AdminProjectsPage'
 import CompanyApplicationsPage from './pages/CompanyApplicationsPage'
-import StudentProfilePage from './pages/StudentProfilePage'
+import SettingsPage from './pages/SettingsPage'
+import PersonalProfilePage from './pages/PersonalProfilePage'
 import NotFound from './pages/NotFound'
 import InternshipsPage from './pages/InternshipsPage'
 import ProjectsPage from './pages/ProjectsPage'
 import CompetitionsPage from './pages/CompetitionsPage'
 import BreakoutRoomsPage from './pages/BreakoutRoomsPage'
 import SeminarsPage from './pages/SeminarsPage'
+import NotificationsPage from './pages/NotificationsPage'
 
 /**
  * App Component
@@ -34,7 +37,7 @@ import SeminarsPage from './pages/SeminarsPage'
  */
 function App() {
     return (
-        <>
+        <NotificationProvider>
             <TopNavbar />
             <Routes>
                 {/* Public */}
@@ -53,14 +56,6 @@ function App() {
                     element={
                         <ProtectedRoute allowedRoles={['Student']}>
                             <StudentDashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/student/profile"
-                    element={
-                        <ProtectedRoute allowedRoles={['Student']}>
-                            <StudentProfilePage />
                         </ProtectedRoute>
                     }
                 />
@@ -127,13 +122,36 @@ function App() {
                             <AdminSettingsPage />
                         </ProtectedRoute>
                     }
+                />                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute allowedRoles={['Student', 'Company', 'Admin']}>
+                            <PersonalProfilePage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/settings"
+                    element={
+                        <ProtectedRoute allowedRoles={['Student', 'Company', 'Admin']}>
+                            <SettingsPage />
+                        </ProtectedRoute>
+                    }
+                />                <Route
+                    path="/notifications"
+                    element={
+                        <ProtectedRoute allowedRoles={['Student', 'Company', 'Admin']}>
+                            <NotificationsPage />
+                        </ProtectedRoute>
+                    }
                 />
 
 
                 {/* Catch-all */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
-        </>
+        </NotificationProvider>
     )
 }
 
