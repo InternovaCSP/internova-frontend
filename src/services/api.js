@@ -37,4 +37,8 @@ export const authManagementApi = {
     deleteAccount: () => api.delete('/auth/account')
 };
 
+export const adminApi = {
+    getStats: () => api.get('/admin/stats')
+};
+
 export default api;
