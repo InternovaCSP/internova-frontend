@@ -7,11 +7,12 @@
   background-color: transparent;
   pointer-events: none;
   transition: all 0.3s ease;
+  overflow: hidden; /* Added to clip hidden elements like skip link */
 }
 
 .in-skip-link {
   position: absolute;
-  top: -40px;
+  top: -100px; /* Moved further up from -40px to ensure it's hidden */
   left: 16px;
   background: var(--lp-blue);
   color: white;
