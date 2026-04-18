@@ -1,0 +1,343 @@
+/* ── Notifications Module ────────────────────────────────────────────────── */
+
+:root {
+    --notif-unread-bg: rgba(108, 99, 255, 0.04);
+    --notif-dot-color: #6c63ff;
+}
+
+.in-notifications-layout {
+    display: flex;
+    gap: 32px;
+    padding-top: 24px;
+}
+
+/* Sidebar */
+.in-notifications-sidebar {
+    width: 260px;
+    flex-shrink: 0;
+}
+
+.in-sidebar-card {
+    background: var(--app-bg);
+    border: 1px solid var(--app-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    position: sticky;
+    top: 100px;
+}
+
+.in-sidebar-card h3 {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--app-muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.in-sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.in-sidebar-link {
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--app-text);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.in-sidebar-link:hover {
+    background: var(--app-surface);
+}
+
+.in-sidebar-link.active {
+    background: var(--app-primary);
+    color: white;
+}
+
+/* Main List */
+.in-notifications-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.in-notif-card {
+    background: var(--app-bg);
+    border: 1px solid var(--app-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.in-notif-card:hover {
+    border-color: var(--app-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.in-notif-card.unread {
+    background: var(--notif-unread-bg);
+    border-left: 4px solid var(--app-primary);
+}
+
+.in-notif-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--app-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.in-notif-body {
+    flex: 1;
+}
+
+.in-notif-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.in-notif-badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--app-primary);
+    background: rgba(108, 99, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 99px;
+}
+
+.in-notif-date {
+    font-size: 12px;
+    color: var(--app-muted);
+}
+
+.in-notif-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--app-text);
+    margin: 0 0 8px;
+    line-height: 1.4;
+}
+
+.in-notif-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--app-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.in-unread-indicator {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--notif-dot-color);
+}
+
+/* Empty State */
+.in-empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    background: var(--app-bg);
+    border: 1px dashed var(--app-border);
+    border-radius: var(--radius);
+}
+
+.in-empty-icon {
+    width: 100px;
+    height: 100px;
+    background: var(--app-surface);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    color: var(--app-muted);
+}
+
+.in-empty-state h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.in-empty-state p {
+    color: var(--app-muted);
+}
+
+/* Pagination */
+.in-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.in-pagination-btn {
+    background: var(--app-bg);
+    border: 1px solid var(--app-border);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.in-pagination-btn:hover:not(:disabled) {
+    border-color: var(--app-primary);
+    color: var(--app-primary);
+}
+
+.in-pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.in-page-info {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--app-muted);
+}
+
+/* Nav Dropdown Specifics */
+.in-nav-dropdown.in-notif-dropdown {
+    width: 360px;
+}
+
+.in-notif-item {
+    padding: 16px;
+    border-bottom: 1px solid var(--app-border);
+    display: flex;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.in-notif-item:hover {
+    background: var(--app-surface);
+}
+
+.in-notif-item.unread {
+    background: var(--notif-unread-bg);
+}
+
+.in-notif-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--notif-dot-color);
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.in-notif-content p {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.in-notif-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.in-notif-type {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--app-primary);
+}
+
+.in-notif-time {
+    font-size: 11px;
+    color: var(--app-muted);
+}
+
+.in-notif-action {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--app-primary);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.in-notif-empty {
+    padding: 40px;
+    text-align: center;
+    color: var(--app-muted);
+}
+
+.in-notif-empty p {
+    margin-top: 12px;
+    font-weight: 600;
+}
+
+/* Header Action Buttons */
+.in-header-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: var(--app-primary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.in-header-action-btn:hover {
+    background: rgba(108, 99, 255, 0.1);
+}
+
+@media (max-width: 900px) {
+    .in-notifications-layout {
+        flex-direction: column;
+    }
+    
+    .in-notifications-sidebar {
+        width: 100%;
+    }
+    
+    .in-sidebar-card {
+        position: static;
+    }
+    
+    .in-sidebar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
