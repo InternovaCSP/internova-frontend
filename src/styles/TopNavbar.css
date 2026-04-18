@@ -11,7 +11,7 @@
 
 .in-skip-link {
   position: absolute;
-  top: -40px;
+  top: -100px; /* Moved further up to ensure it's hidden */
   left: 16px;
   background: var(--lp-blue);
   color: white;
@@ -19,11 +19,15 @@
   z-index: 1001;
   border-radius: 4px;
   font-weight: 600;
-  transition: top 0.2s;
+  transition: all 0.2s;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .in-skip-link:focus {
   top: 16px;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .in-navbar {
