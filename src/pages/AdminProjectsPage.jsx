@@ -477,46 +477,49 @@ function CreateProjectModal({ onClose, onCreated }) {
 
                 {/* Form */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    {/* Title */}
-                    <div>
-                        <label style={labelStyle}><FileText size={14} /> Project Title</label>
-                        <input
-                            type="text"
-                            value={form.title}
-                            onChange={e => handleChange('title', e.target.value)}
-                            placeholder="e.g., AI-Powered Campus Navigator"
-                            style={inputStyle}
-                            onFocus={e => e.target.style.borderColor = '#2563eb'}
-                            onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                        />
-                    </div>
-
-                    {/* Category */}
-                    <div>
-                        <label style={labelStyle}><Tag size={14} /> Category</label>
-                        <div style={{ position: 'relative' }}>
-                            <select
-                                value={form.category}
-                                onChange={e => handleChange('category', e.target.value)}
-                                style={{
-                                    ...inputStyle,
-                                    appearance: 'none',
-                                    cursor: 'pointer',
-                                    paddingRight: '40px'
-                                }}
-                            >
-                                {categories.map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </select>
-                            <ChevronDown
-                                size={16}
-                                style={{
-                                    position: 'absolute', right: '14px', top: '50%',
-                                    transform: 'translateY(-50%)', color: '#94a3b8',
-                                    pointerEvents: 'none'
-                                }}
+                    {/* Title & Category Row */}
+                    <div style={{ display: 'flex', gap: '20px' }}>
+                        {/* Title */}
+                        <div style={{ flex: 1.5 }}>
+                            <label style={labelStyle}><FileText size={14} /> Project Title</label>
+                            <input
+                                type="text"
+                                value={form.title}
+                                onChange={e => handleChange('title', e.target.value)}
+                                placeholder="e.g., AI-Powered Campus Navigator"
+                                style={inputStyle}
+                                onFocus={e => e.target.style.borderColor = '#2563eb'}
+                                onBlur={e => e.target.style.borderColor = '#e2e8f0'}
                             />
+                        </div>
+
+                        {/* Category */}
+                        <div style={{ flex: 1 }}>
+                            <label style={labelStyle}><Tag size={14} /> Category</label>
+                            <div style={{ position: 'relative' }}>
+                                <select
+                                    value={form.category}
+                                    onChange={e => handleChange('category', e.target.value)}
+                                    style={{
+                                        ...inputStyle,
+                                        appearance: 'none',
+                                        cursor: 'pointer',
+                                        paddingRight: '40px'
+                                    }}
+                                >
+                                    {categories.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown
+                                    size={16}
+                                    style={{
+                                        position: 'absolute', right: '14px', top: '50%',
+                                        transform: 'translateY(-50%)', color: '#94a3b8',
+                                        pointerEvents: 'none'
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
 
