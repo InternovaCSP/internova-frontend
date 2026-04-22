@@ -45,11 +45,7 @@ const AdminSidebar = () => {
             icon: <FolderKanban size={20} />, 
             path: '/admin/projects' 
         },
-        { 
-            name: 'User Management', 
-            icon: <Users size={20} />, 
-            path: '/admin/users' 
-        },
+
         { 
             name: 'Settings', 
             icon: <Settings size={20} />, 
