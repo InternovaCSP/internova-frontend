@@ -141,6 +141,19 @@ export default function CompetitionsPage() {
         }
     };
 
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this competition?')) return;
+        
+        try {
+            await competitionApi.delete(id);
+            setCompetitions(prev => prev.filter(c => c.id !== id));
+            if (selectedCompetition?.id === id) setSelectedCompetition(null);
+        } catch (error) {
+            console.error('Failed to delete competition:', error);
+            alert("Failed to delete competition. You may not have permission.");
+        }
+    };
+
     // Filter Logic
     const filteredData = useMemo(() => {
         let result = [...competitions];
@@ -297,6 +310,7 @@ export default function CompetitionsPage() {
                                         onViewDetails={(c) => setSelectedCompetition(c)}
                                         onRegister={handleRegister}
                                         onEdit={handleEditClick}
+                                        onDelete={handleDelete}
                                     />
                                 ))}
                             </div>
@@ -381,6 +395,20 @@ export default function CompetitionsPage() {
                                     }}
                                 >
                                     {selectedCompetition.currentUserStatus ? 'Already Registered' : 'Register Now'}
+                                </button>
+                            )}
+                            {user?.role === 'Admin' && (
+                                <button
+                                    className="lp-btn lp-btn--danger"
+                                    onClick={() => handleDelete(selectedCompetition.id)}
+                                    style={{
+                                        backgroundColor: '#dc3545',
+                                        color: 'white',
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Delete Competition
                                 </button>
                             )}
                         </div>

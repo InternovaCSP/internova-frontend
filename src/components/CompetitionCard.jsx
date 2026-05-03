@@ -1,8 +1,8 @@
 import React from 'react';
-import { Calendar, Users, Award, CheckCircle2 } from 'lucide-react';
+import { Calendar, Users, Award, CheckCircle2, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export default function CompetitionCard({ competition, userRole, onViewDetails, onRegister, onEdit }) {
+export default function CompetitionCard({ competition, userRole, onViewDetails, onRegister, onEdit, onDelete }) {
 
     // Status Badge Helpers
     const getStatusStyle = (status) => {
@@ -148,21 +148,34 @@ export default function CompetitionCard({ competition, userRole, onViewDetails, 
                 )}
 
                 {userRole === 'Admin' && (
-                    <button
-                        className="in-btn"
-                        onClick={() => onEdit(competition)}
-                        style={{
-                            flex: 1,
-                            marginLeft: '8px',
-                            justifyContent: 'center',
-                            backgroundColor: 'var(--lp-blue)',
-                            color: 'var(--lp-white)',
-                            border: 'none',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Edit
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px', flex: 1, marginLeft: '8px' }}>
+                        <button
+                            className="in-btn"
+                            onClick={() => onEdit(competition)}
+                            style={{
+                                flex: 1,
+                                justifyContent: 'center',
+                                backgroundColor: 'var(--lp-blue)',
+                                color: 'var(--lp-white)',
+                                border: 'none',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Edit
+                        </button>
+                        <button
+                            className="in-btn prj-btn--danger"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (window.confirm('Delete this competition?')) {
+                                    onDelete(competition.id);
+                                }
+                            }}
+                            style={{ padding: '10px' }}
+                        >
+                            <Trash2 size={16} />
+                        </button>
+                    </div>
                 )}
             </div>
         </div>
