@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
-import { X, Users, Clock, Star, MapPin, ChevronRight, CheckCircle2, Settings } from 'lucide-react';
+import { X, Users, Clock, Star, MapPin, ChevronRight, CheckCircle2, Settings, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export default function ProjectDetailModal({ project, onClose, onRequestJoin }) {
+export default function ProjectDetailModal({ project, onClose, onRequestJoin, onDelete }) {
     const { user } = useAuth();
 
     if (!project) return null;
 
     const isFull = project.availableSlots === 0;
     const isLeader = user?.userId && project.leaderId && String(user.userId) === String(project.leaderId);
+    const isAdmin = user?.role === 'Admin';
 
     const statusConfig = {
         'Pending': { bg: '#e0f2fe', text: '#0284c7', label: 'Request Pending' },
@@ -106,7 +107,7 @@ export default function ProjectDetailModal({ project, onClose, onRequestJoin }) 
                 <div className="prj-modal-section">
                     <h4 className="prj-modal-section-title">Required Skills</h4>
                     <div className="prj-tags">
-                        {project.skills.map((skill, idx) => (
+                        {(project.skills || []).map((skill, idx) => (
                             <span key={idx} className="prj-skill-tag">{skill}</span>
                         ))}
                     </div>
@@ -143,6 +144,14 @@ export default function ProjectDetailModal({ project, onClose, onRequestJoin }) 
                                 </button>
                             )}
                         </>
+                    )}
+                    {(isAdmin || isLeader) && onDelete && (
+                        <button 
+                            className="prj-btn prj-btn--danger" 
+                            onClick={() => { if(window.confirm('Are you sure you want to delete this project?')) { onDelete(project.id); onClose(); } }}
+                        >
+                            <Trash2 size={14} /> Delete Project
+                        </button>
                     )}
                     <button className="prj-btn prj-btn--outline" onClick={onClose}>
                         Close

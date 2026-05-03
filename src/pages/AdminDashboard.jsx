@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { 
-    Building2, Bell, Search, Users, Briefcase, GraduationCap, TrendingUp, ChevronRight 
+    Building2, Bell, Search, Users, Briefcase, GraduationCap, TrendingUp, ChevronRight, FolderKanban 
 } from 'lucide-react'
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -203,6 +203,74 @@ export default function AdminDashboard() {
                             <div style={{ flex: 1 }}>
                                 <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', margin: 0 }}>Company Approvals</h3>
                                 <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0 0' }}>Review and verify business memberships</p>
+                            </div>
+                            <ChevronRight size={20} color="#94a3b8" />
+                        </button>
+
+                        <button
+                            onClick={() => navigate('/admin/projects')}
+                            style={{
+                                padding: '24px',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '20px',
+                                transition: 'all 0.2s',
+                                background: 'white',
+                                borderRadius: '16px',
+                                border: '1px solid #e2e8f0',
+                                outline: 'none'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.05)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = 'none';
+                            }}
+                        >
+                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f5f3ff', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center' }}>
+                                <FolderKanban size={24} color="#8b5cf6" />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', margin: 0 }}>Project Management</h3>
+                                <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0 0' }}>Manage research and student projects</p>
+                            </div>
+                            <ChevronRight size={20} color="#94a3b8" />
+                        </button>
+
+                        <button
+                            onClick={() => navigate('/admin/projects?create=true')}
+                            style={{
+                                padding: '24px',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '20px',
+                                transition: 'all 0.2s',
+                                background: 'white',
+                                borderRadius: '16px',
+                                border: '1px solid #e2e8f0',
+                                outline: 'none'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.05)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = 'none';
+                            }}
+                        >
+                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center' }}>
+                                <Plus size={24} color="#10b981" />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', margin: 0 }}>Create New Project</h3>
+                                <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0 0' }}>Launch a new initiative immediately</p>
                             </div>
                             <ChevronRight size={20} color="#94a3b8" />
                         </button>
