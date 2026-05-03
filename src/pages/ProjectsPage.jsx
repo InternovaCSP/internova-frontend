@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import ProjectsFilterBar from '../components/ProjectsFilterBar';
 import ProjectCard from '../components/ProjectCard';
 import ProjectDetailModal from '../components/ProjectDetailModal';
-import { getProjects, joinProject, getMyRequests, createProject } from '../api/projectApi';
+import { getProjects, joinProject, getMyRequests, createProject, deleteProject } from '../api/projectApi';
 import CreateProjectModal from '../components/CreateProjectModal';
 
 /**

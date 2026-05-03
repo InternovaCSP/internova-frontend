@@ -1,31 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, Plus, X, Calendar, Users } from 'lucide-react';
+import { Search, Plus, ChevronRight, X, Calendar, MapPin, Award, Users, BookOpen, Clock, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import CompetitionsFilterBar from '../components/CompetitionsFilterBar';
-import CompetitionCard from '../components/CompetitionCard';
 import { competitionApi } from '../services/api';
+import CompetitionCard from '../components/CompetitionCard';
+import CompetitionDetailModal from '../components/CompetitionDetailModal';
 
-/**
- * CompetitionsPage Component
- * 
- * An advanced feature page listing University/Global Hackathons and Competitions.
- * Supports specialized filters (Team Size, Category), rendering `CompetitionCard` components,
- * and maintains an active Modal dialog state for viewing extended competition details in a popup.
- * 
- * @returns {JSX.Element} The competitions interface.
- */
 export default function CompetitionsPage() {
     const { user } = useAuth();
     const [competitions, setCompetitions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Filter States
+    const [sortBy, setSortBy] = useState('newest');
     const [searchQuery, setSearchQuery] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
-    const [eligibilityFilter, setEligibilityFilter] = useState('');
-    const [sortBy, setSortBy] = useState('newest');
 
     // Modal States
     const [selectedCompetition, setSelectedCompetition] = useState(null);
@@ -42,38 +29,37 @@ export default function CompetitionsPage() {
         skills: ''
     });
 
-    // Initial Load
     useEffect(() => {
-        const fetchCompetitions = async () => {
-            setIsLoading(true);
-            try {
-                const response = await competitionApi.getAll();
-                const mappedData = response.data.map(comp => ({
-                    ...comp,
-                    organizer: comp.organizerName || 'University Organizer',
-                    description: comp.description || 'No description available.',
-                    category: comp.category || 'General',
-                    status: new Date(comp.endDate) < new Date() ? 'Closed' : 'Upcoming',
-                    eligibility: comp.eligibilityCriteria || 'Open to all students',
-                    startDate: comp.startDate ? new Date(comp.startDate).toLocaleDateString() : 'TBD',
-                    endDate: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
-                    deadline: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
-                    rawStartDate: comp.startDate,
-                    rawEndDate: comp.endDate,
-                    skills: comp.skills ? comp.skills.split(',').map(s => s.trim()) : []
-                }));
-                setCompetitions(mappedData);
-            } catch (error) {
-                console.error('Failed to fetch competitions:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         fetchCompetitions();
     }, []);
 
-    // Registration Handler
+    const fetchCompetitions = async () => {
+        setIsLoading(true);
+        try {
+            const response = await competitionApi.getAll();
+            const data = response.data || response; // Handle different API response formats
+            const mappedData = data.map(comp => ({
+                ...comp,
+                organizer: comp.organizerName || 'University Organizer',
+                description: comp.description || 'No description available.',
+                category: comp.category || 'General',
+                status: new Date(comp.endDate) < new Date() ? 'Closed' : 'Upcoming',
+                eligibility: comp.eligibilityCriteria || 'Open to all students',
+                startDate: comp.startDate ? new Date(comp.startDate).toLocaleDateString() : 'TBD',
+                endDate: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
+                deadline: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
+                rawStartDate: comp.startDate,
+                rawEndDate: comp.endDate,
+                skills: comp.skills ? (Array.isArray(comp.skills) ? comp.skills : comp.skills.split(',').map(s => s.trim())) : []
+            }));
+            setCompetitions(mappedData);
+        } catch (error) {
+            console.error('Failed to fetch competitions:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleRegister = async (id) => {
         try {
             await competitionApi.register(id);
@@ -84,23 +70,20 @@ export default function CompetitionsPage() {
                 return comp;
             }));
 
-            // Update modal state if it's currently open
             if (selectedCompetition && selectedCompetition.id === id) {
                 setSelectedCompetition(prev => ({ ...prev, currentUserStatus: 'Registered' }));
             }
+            alert('Successfully registered!');
         } catch (error) {
             console.error('Registration failed:', error);
-            alert(error.response?.data?.error || 'Failed to register for competition.');
+            alert(error.response?.data?.error || 'Failed to register.');
         }
     };
 
     const handleCreateCompetition = async (e) => {
         e.preventDefault();
         try {
-            const payload = {
-                ...newComp,
-                organizerId: user.userId
-            };
+            const payload = { ...newComp, organizerId: user.userId };
             await competitionApi.create(payload);
             setIsCreateModalOpen(false);
             setNewComp({ title: '', description: '', category: '', eligibilityCriteria: '', startDate: '', endDate: '', skills: '' });
@@ -127,10 +110,7 @@ export default function CompetitionsPage() {
     const handleUpdateCompetition = async (e) => {
         e.preventDefault();
         try {
-            const payload = {
-                ...newComp,
-                isApproved: true
-            };
+            const payload = { ...newComp, isApproved: true };
             await competitionApi.update(editingId, payload);
             setIsEditModalOpen(false);
             setEditingId(null);
@@ -142,28 +122,24 @@ export default function CompetitionsPage() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this competition?')) return;
-        
         try {
             await competitionApi.delete(id);
             setCompetitions(prev => prev.filter(c => c.id !== id));
             if (selectedCompetition?.id === id) setSelectedCompetition(null);
         } catch (error) {
             console.error('Failed to delete competition:', error);
-            alert("Failed to delete competition. You may not have permission.");
+            alert("Failed to delete competition.");
         }
     };
 
-    // Filter Logic
     const filteredData = useMemo(() => {
         let result = [...competitions];
-
+        
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
-            result = result.filter(item =>
-                item.title.toLowerCase().includes(q) ||
-                item.organizer.toLowerCase().includes(q) ||
-                item.skills.some(skill => skill.toLowerCase().includes(q))
+            result = result.filter(item => 
+                item.title.toLowerCase().includes(q) || 
+                item.organizer.toLowerCase().includes(q)
             );
         }
 
@@ -171,74 +147,18 @@ export default function CompetitionsPage() {
             result = result.filter(item => item.category === categoryFilter);
         }
 
-        if (statusFilter) {
-            result = result.filter(item => item.status === statusFilter);
-        }
-
-        if (eligibilityFilter) {
-            result = result.filter(item => item.eligibility === eligibilityFilter);
-        }
-
         result.sort((a, b) => {
-            if (sortBy === 'newest') return new Date(b.startDate) - new Date(a.startDate);
-            if (sortBy === 'deadline') return new Date(a.deadline) - new Date(b.deadline);
-            return 0; // Default or Popular logic can be extended
+            if (sortBy === 'newest') return new Date(b.rawStartDate || 0) - new Date(a.rawStartDate || 0);
+            if (sortBy === 'deadline') return new Date(a.rawEndDate || 0) - new Date(b.rawEndDate || 0);
+            return 0;
         });
-
         return result;
-    }, [competitions, searchQuery, categoryFilter, statusFilter, eligibilityFilter, sortBy]);
+    }, [competitions, sortBy, searchQuery, categoryFilter]);
 
-    const eligibilityOptions = useMemo(() => {
-        return [...new Set(competitions.map(c => c.eligibility))];
-    }, [competitions]);
+
 
     return (
         <div className="in-shell">
-            <style>{`
-                /* ── Internova Specialized UI Components ────────────────── */
-                .in-card {
-                  background: var(--lp-white);
-                  border-radius: 12px;
-                  padding: 24px;
-                  border: 1px solid var(--lp-border);
-                  box-shadow: 0 4px 12px rgba(13, 27, 42, 0.03);
-                  transition: transform 0.2s, box-shadow 0.2s;
-                }
-
-                .in-tag {
-                  display: inline-flex;
-                  align-items: center;
-                  padding: 4px 10px;
-                  border-radius: 6px;
-                  font-size: 12px;
-                  font-weight: 600;
-                  background: var(--lp-slate);
-                  color: var(--lp-navy);
-                  border: 1px solid var(--lp-border);
-                  transition: all 0.2s;
-                }
-
-                .in-tag:hover {
-                  background: white;
-                  border-color: var(--lp-blue);
-                  color: var(--lp-blue);
-                  transform: translateY(-1px);
-                }
-
-                .in-btn {
-                  display: inline-flex;
-                  align-items: center;
-                  gap: 8px;
-                  padding: 10px 18px;
-                  border-radius: 8px;
-                  font-size: 14px;
-                  font-weight: 600;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  border: 1px solid transparent;
-                }
-            `}</style>
-
             <div className="in-container">
                 {/* ── Header Section ── */}
                 <section className="in-header-section">
@@ -258,47 +178,63 @@ export default function CompetitionsPage() {
                 </section>
 
                 {/* ── Filter Bar ── */}
-                <CompetitionsFilterBar
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                    categoryFilter={categoryFilter}
-                    setCategoryFilter={setCategoryFilter}
-                    statusFilter={statusFilter}
-                    setStatusFilter={setStatusFilter}
-                    eligibilityFilter={eligibilityFilter}
-                    setEligibilityFilter={setEligibilityFilter}
-                    sortBy={sortBy}
-                    setSortBy={setSortBy}
-                    eligibilityOptions={eligibilityOptions}
-                />
+                <div className="in-filters-bar">
+                    <div className="in-search-wrap">
+                        <Search size={18} className="in-search-icon" />
+                        <input 
+                            className="in-search-input" 
+                            placeholder="Search competitions or organizers..." 
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    <div className="in-filters-group">
+                        <select 
+                            className="in-select" 
+                            style={{ minWidth: '150px' }}
+                            value={categoryFilter} 
+                            onChange={e => setCategoryFilter(e.target.value)}
+                        >
+                            <option value="">All Categories</option>
+                            {[...new Set(competitions.map(c => c.category))].map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                        <select 
+                            className="in-select" 
+                            style={{ minWidth: '150px' }}
+                            value={sortBy} 
+                            onChange={e => setSortBy(e.target.value)}
+                        >
+                            <option value="newest">Newest First</option>
+                            <option value="deadline">Nearest Deadline</option>
+                        </select>
+                    </div>
+                </div>
 
                 {/* ── Main Content Area ── */}
                 {isLoading ? (
                     <div className="in-grid">
-                        {[1, 2, 3, 4, 5, 6].map(n => (
-                            <div key={n} className="in-card" style={{ height: '340px', display: 'flex', flexDirection: 'column' }}>
+                        {[1, 2, 3].map(n => (
+                            <div key={n} className="prj-card" style={{ height: '340px' }}>
                                 <div className="in-skeleton in-sk-title" style={{ marginTop: '20px' }}></div>
                                 <div className="in-skeleton in-sk-badge" style={{ marginTop: '12px' }}></div>
                                 <div className="in-skeleton in-sk-text" style={{ marginTop: '24px' }}></div>
                                 <div className="in-skeleton in-sk-text" style={{ width: '80%' }}></div>
-                                <div className="in-skeleton in-sk-text" style={{ width: '60%' }}></div>
-                                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                                    <div className="in-skeleton in-sk-btn"></div>
-                                </div>
                             </div>
                         ))}
                     </div>
                 ) : (
                     <>
-                        <div className="in-grid-meta">
-                            <span>Showing {filteredData.length} competitions</span>
+                        <div className="in-grid-meta" style={{ marginBottom: '16px', color: '#64748b', fontSize: '14px' }}>
+                            Showing {filteredData.length} competitions
                         </div>
 
                         {filteredData.length === 0 ? (
                             <div className="in-empty-state">
-                                <div className="in-empty-icon" style={{ opacity: 0.5 }}>🏆</div>
-                                <h3 className="in-empty-title">No competitions found.</h3>
-                                <p className="in-empty-desc">Adjust your filters or try a different search term.</p>
+                                <BookOpen size={48} style={{ opacity: 0.2, marginBottom: '16px' }} />
+                                <h3>No competitions found</h3>
+                                <p>Adjust your filters or try a different search term.</p>
                             </div>
                         ) : (
                             <div className="in-grid">
@@ -307,7 +243,7 @@ export default function CompetitionsPage() {
                                         key={comp.id}
                                         competition={comp}
                                         userRole={user?.role}
-                                        onViewDetails={(c) => setSelectedCompetition(c)}
+                                        onViewDetails={setSelectedCompetition}
                                         onRegister={handleRegister}
                                         onEdit={handleEditClick}
                                         onDelete={handleDelete}
@@ -319,199 +255,33 @@ export default function CompetitionsPage() {
                 )}
             </div>
 
-            {/* ── Details Modal Overlay ── */}
-            {selectedCompetition && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(13, 27, 42, 0.4)', backdropFilter: 'blur(4px)',
-                    zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px'
-                }}>
-                    <div style={{
-                        backgroundColor: 'var(--lp-white)', borderRadius: '12px', width: '100%', maxWidth: '640px',
-                        boxShadow: '0 24px 64px rgba(13, 27, 42, 0.12)', border: '1px solid var(--lp-border)',
-                        display: 'flex', flexDirection: 'column', maxHeight: '90vh'
-                    }}>
-                        {/* Modal Header */}
-                        <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--lp-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <div>
-                                <h2 className="lp-h2" style={{ marginBottom: '8px' }}>{selectedCompetition.title}</h2>
-                                <p className="lp-body" style={{ fontSize: '14px' }}>{selectedCompetition.organizer}</p>
-                            </div>
-                            <button onClick={() => setSelectedCompetition(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lp-text-secondary)', padding: '4px' }}>
-                                <X size={24} />
-                            </button>
-                        </div>
+            {/* ── Details Modal ── */}
+            <CompetitionDetailModal 
+                competition={selectedCompetition}
+                onClose={() => setSelectedCompetition(null)}
+                onRegister={handleRegister}
+                onDelete={handleDelete}
+            />
 
-                        {/* Modal Body */}
-                        <div style={{ padding: '32px', overflowY: 'auto' }}>
-                            <div style={{ marginBottom: '24px' }}>
-                                <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '12px', fontWeight: '700', color: 'var(--lp-blue)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Description</h4>
-                                <p className="lp-body" style={{ fontSize: '15px', color: 'var(--lp-text-primary)', lineHeight: '1.7' }}>{selectedCompetition.description}</p>
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px', padding: '20px', background: 'var(--lp-gray)', borderRadius: '12px', border: '1px solid var(--lp-border)' }}>
-                                <div>
-                                    <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '13px', fontWeight: '700', marginBottom: '10px', color: 'var(--lp-navy)' }}>Eligibility</h4>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--lp-text-secondary)' }}>
-                                        <Users size={16} /> {selectedCompetition.eligibility}
-                                    </div>
-                                </div>
-                                <div>
-                                    <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '13px', fontWeight: '700', marginBottom: '10px', color: 'var(--lp-navy)' }}>Important Dates</h4>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--lp-text-secondary)' }}>
-                                        <Calendar size={16} /> {selectedCompetition.startDate} - {selectedCompetition.endDate}
-                                    </div>
-                                    <div style={{ fontSize: '13px', color: 'var(--lp-blue)', fontWeight: '600', marginTop: '6px' }}>
-                                        Deadline: {selectedCompetition.deadline}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '12px', fontWeight: '700', color: 'var(--lp-blue)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>Required Domains & Skills</h4>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                    {selectedCompetition.skills.map((skill, index) => (
-                                        <span key={index} className="in-tag" style={{ padding: '6px 14px', fontSize: '13px', background: 'white', boxShadow: '0 2px 4px rgba(0,0,0,0.04)' }}>
-                                            {skill}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Modal Footer */}
-                        <div style={{ padding: '24px 32px', borderTop: '1px solid var(--lp-border)', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
-                            <button className="lp-btn lp-btn--outline" onClick={() => setSelectedCompetition(null)}>Close</button>
-                            {user?.role === 'Student' && (
-                                <button
-                                    className={`lp-btn ${selectedCompetition.currentUserStatus ? '' : 'lp-btn--primary'}`}
-                                    disabled={!!selectedCompetition.currentUserStatus}
-                                    onClick={() => handleRegister(selectedCompetition.id)}
-                                    style={{
-                                        backgroundColor: selectedCompetition.currentUserStatus ? 'var(--lp-gray)' : 'var(--lp-blue)',
-                                        color: selectedCompetition.currentUserStatus ? 'var(--lp-text-secondary)' : 'var(--lp-white)',
-                                        border: '1px solid transparent',
-                                        cursor: selectedCompetition.currentUserStatus ? 'default' : 'pointer'
-                                    }}
-                                >
-                                    {selectedCompetition.currentUserStatus ? 'Already Registered' : 'Register Now'}
-                                </button>
-                            )}
-                            {user?.role === 'Admin' && (
-                                <button
-                                    className="lp-btn lp-btn--danger"
-                                    onClick={() => handleDelete(selectedCompetition.id)}
-                                    style={{
-                                        backgroundColor: '#dc3545',
-                                        color: 'white',
-                                        border: 'none',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    Delete Competition
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-            {/* ── Create Competition Modal ── */}
+            {/* ── Create Modal ── */}
             {isCreateModalOpen && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(13, 27, 42, 0.4)', backdropFilter: 'blur(4px)',
-                    zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px'
-                }}>
-                    <div style={{
-                        backgroundColor: 'var(--lp-white)', borderRadius: '12px', width: '100%', maxWidth: '500px',
-                        boxShadow: '0 24px 64px rgba(13, 27, 42, 0.12)', border: '1px solid var(--lp-border)',
-                        display: 'flex', flexDirection: 'column', maxHeight: '90vh'
-                    }}>
-                        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--lp-border)', display: 'flex', justifyContent: 'space-between' }}>
-                            <h2 className="lp-h3">Post New Competition</h2>
-                            <button onClick={() => setIsCreateModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+                <div className="prj-modal-overlay" onClick={() => setIsCreateModalOpen(false)}>
+                    <div className="prj-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+                        <button className="prj-modal-close" onClick={() => setIsCreateModalOpen(false)}><X size={20} /></button>
+                        <div className="prj-modal-header">
+                            <h2 className="prj-modal-title">Post New Competition</h2>
                         </div>
-                        <form onSubmit={handleCreateCompetition} style={{ padding: '24px', overflowY: 'auto' }}>
-                            <div style={{ marginBottom: '16px' }}>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Title</label>
-                                <input type="text" className="in-input" required value={newComp.title} onChange={e => setNewComp({ ...newComp, title: e.target.value })} />
+                        <form onSubmit={handleCreateCompetition} className="prj-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <input className="in-input" placeholder="Title" required value={newComp.title} onChange={e => setNewComp({...newComp, title: e.target.value})} />
+                            <input className="in-input" placeholder="Category" value={newComp.category} onChange={e => setNewComp({...newComp, category: e.target.value})} />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                <input type="date" className="in-input" value={newComp.startDate} onChange={e => setNewComp({...newComp, startDate: e.target.value})} />
+                                <input type="date" className="in-input" value={newComp.endDate} onChange={e => setNewComp({...newComp, endDate: e.target.value})} />
                             </div>
-                            <div style={{ marginBottom: '16px' }}>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Category</label>
-                                <input type="text" className="in-input" placeholder="e.g. Hackathon, Research" value={newComp.category} onChange={e => setNewComp({ ...newComp, category: e.target.value })} />
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Start Date</label>
-                                    <input type="date" className="in-input" value={newComp.startDate} onChange={e => setNewComp({ ...newComp, startDate: e.target.value })} />
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>End Date</label>
-                                    <input type="date" className="in-input" value={newComp.endDate} onChange={e => setNewComp({ ...newComp, endDate: e.target.value })} />
-                                </div>
-                            </div>
-                            <div style={{ marginBottom: '16px' }}>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Skills (comma separated)</label>
-                                <input type="text" className="in-input" placeholder="React, Python, UI/UX" value={newComp.skills} onChange={e => setNewComp({ ...newComp, skills: e.target.value })} />
-                            </div>
-                            <div style={{ marginBottom: '24px' }}>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Description</label>
-                                <textarea className="in-input" rows="3" value={newComp.description} onChange={e => setNewComp({ ...newComp, description: e.target.value })}></textarea>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                                <button type="button" className="lp-btn lp-btn--outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</button>
-                                <button type="submit" className="lp-btn lp-btn--primary">Post Now</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-            {/* ── Edit Competition Modal ── */}
-            {isEditModalOpen && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(13, 27, 42, 0.4)', backdropFilter: 'blur(4px)',
-                    zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px'
-                }}>
-                    <div style={{
-                        backgroundColor: 'var(--lp-white)', borderRadius: '12px', width: '100%', maxWidth: '500px',
-                        boxShadow: '0 24px 64px rgba(13, 27, 42, 0.12)', border: '1px solid var(--lp-border)',
-                        display: 'flex', flexDirection: 'column', maxHeight: '90vh'
-                    }}>
-                        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--lp-border)', display: 'flex', justifyContent: 'space-between' }}>
-                            <h2 className="lp-h3">Edit Competition</h2>
-                            <button onClick={() => { setIsEditModalOpen(false); setEditingId(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
-                        </div>
-                        <form onSubmit={handleUpdateCompetition} style={{ padding: '24px', overflowY: 'auto' }}>
-                            <div style={{ marginBottom: '16px' }}>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Title</label>
-                                <input type="text" className="in-input" required value={newComp.title} onChange={e => setNewComp({ ...newComp, title: e.target.value })} />
-                            </div>
-                            <div style={{ marginBottom: '16px' }}>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Category</label>
-                                <input type="text" className="in-input" placeholder="e.g. Hackathon, Research" value={newComp.category} onChange={e => setNewComp({ ...newComp, category: e.target.value })} />
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Start Date</label>
-                                    <input type="date" className="in-input" value={newComp.startDate} onChange={e => setNewComp({ ...newComp, startDate: e.target.value })} />
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>End Date</label>
-                                    <input type="date" className="in-input" value={newComp.endDate} onChange={e => setNewComp({ ...newComp, endDate: e.target.value })} />
-                                </div>
-                            </div>
-                            <div style={{ marginBottom: '16px' }}>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Skills (comma separated)</label>
-                                <input type="text" className="in-input" placeholder="React, Python, UI/UX" value={newComp.skills} onChange={e => setNewComp({ ...newComp, skills: e.target.value })} />
-                            </div>
-                            <div style={{ marginBottom: '24px' }}>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Description</label>
-                                <textarea className="in-input" rows="3" value={newComp.description} onChange={e => setNewComp({ ...newComp, description: e.target.value })}></textarea>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                                <button type="button" className="lp-btn lp-btn--outline" onClick={() => { setIsEditModalOpen(false); setEditingId(null); }}>Cancel</button>
-                                <button type="submit" className="lp-btn lp-btn--primary">Update Competition</button>
+                            <textarea className="in-input" placeholder="Description" rows={3} value={newComp.description} onChange={e => setNewComp({...newComp, description: e.target.value})} />
+                            <div className="prj-modal-footer" style={{ padding: 0, border: 'none', gap: '12px' }}>
+                                <button type="submit" className="prj-btn prj-btn--primary" style={{ flex: 1 }}>Post Now</button>
+                                <button type="button" className="prj-btn prj-btn--outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</button>
                             </div>
                         </form>
                     </div>
