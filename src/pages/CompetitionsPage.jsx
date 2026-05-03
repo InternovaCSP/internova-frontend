@@ -30,6 +30,8 @@ export default function CompetitionsPage() {
     // Modal States
     const [selectedCompetition, setSelectedCompetition] = useState(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingId, setEditingId] = useState(null);
     const [newComp, setNewComp] = useState({
         title: '',
         description: '',
@@ -56,6 +58,8 @@ export default function CompetitionsPage() {
                     startDate: comp.startDate ? new Date(comp.startDate).toLocaleDateString() : 'TBD',
                     endDate: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
                     deadline: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
+                    rawStartDate: comp.startDate,
+                    rawEndDate: comp.endDate,
                     skills: comp.skills ? comp.skills.split(',').map(s => s.trim()) : []
                 }));
                 setCompetitions(mappedData);
@@ -100,23 +104,40 @@ export default function CompetitionsPage() {
             await competitionApi.create(payload);
             setIsCreateModalOpen(false);
             setNewComp({ title: '', description: '', category: '', eligibilityCriteria: '', startDate: '', endDate: '', skills: '' });
-            // Refresh list
-            const response = await competitionApi.getAll();
-            const mappedData = response.data.map(comp => ({
-                ...comp,
-                organizer: comp.organizerName || 'University Organizer',
-                description: comp.description || 'No description available.',
-                category: comp.category || 'General',
-                status: new Date(comp.endDate) < new Date() ? 'Closed' : 'Upcoming',
-                eligibility: comp.eligibilityCriteria || 'Open to all students',
-                startDate: comp.startDate ? new Date(comp.startDate).toLocaleDateString() : 'TBD',
-                endDate: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
-                deadline: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
-                skills: comp.skills ? comp.skills.split(',').map(s => s.trim()) : []
-            }));
-            setCompetitions(mappedData);
+            fetchCompetitions();
         } catch (error) {
             console.error('Failed to create competition:', error);
+        }
+    };
+
+    const handleEditClick = (comp) => {
+        setEditingId(comp.id);
+        setNewComp({
+            title: comp.title,
+            description: comp.description,
+            category: comp.category,
+            eligibilityCriteria: comp.eligibility,
+            startDate: comp.rawStartDate ? comp.rawStartDate.split('T')[0] : '',
+            endDate: comp.rawEndDate ? comp.rawEndDate.split('T')[0] : '',
+            skills: comp.skills.join(', ')
+        });
+        setIsEditModalOpen(true);
+    };
+
+    const handleUpdateCompetition = async (e) => {
+        e.preventDefault();
+        try {
+            const payload = {
+                ...newComp,
+                isApproved: true
+            };
+            await competitionApi.update(editingId, payload);
+            setIsEditModalOpen(false);
+            setEditingId(null);
+            setNewComp({ title: '', description: '', category: '', eligibilityCriteria: '', startDate: '', endDate: '', skills: '' });
+            fetchCompetitions();
+        } catch (error) {
+            console.error('Failed to update competition:', error);
         }
     };
 
@@ -160,7 +181,50 @@ export default function CompetitionsPage() {
 
     return (
         <div className="in-shell">
+            <style>{`
+                /* ── Internova Specialized UI Components ────────────────── */
+                .in-card {
+                  background: var(--lp-white);
+                  border-radius: 12px;
+                  padding: 24px;
+                  border: 1px solid var(--lp-border);
+                  box-shadow: 0 4px 12px rgba(13, 27, 42, 0.03);
+                  transition: transform 0.2s, box-shadow 0.2s;
+                }
 
+                .in-tag {
+                  display: inline-flex;
+                  align-items: center;
+                  padding: 4px 10px;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  font-weight: 600;
+                  background: var(--lp-slate);
+                  color: var(--lp-navy);
+                  border: 1px solid var(--lp-border);
+                  transition: all 0.2s;
+                }
+
+                .in-tag:hover {
+                  background: white;
+                  border-color: var(--lp-blue);
+                  color: var(--lp-blue);
+                  transform: translateY(-1px);
+                }
+
+                .in-btn {
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 8px;
+                  padding: 10px 18px;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  cursor: pointer;
+                  transition: all 0.2s;
+                  border: 1px solid transparent;
+                }
+            `}</style>
 
             <div className="in-container">
                 {/* ── Header Section ── */}
@@ -232,6 +296,7 @@ export default function CompetitionsPage() {
                                         userRole={user?.role}
                                         onViewDetails={(c) => setSelectedCompetition(c)}
                                         onRegister={handleRegister}
+                                        onEdit={handleEditClick}
                                     />
                                 ))}
                             </div>
@@ -265,31 +330,36 @@ export default function CompetitionsPage() {
 
                         {/* Modal Body */}
                         <div style={{ padding: '32px', overflowY: 'auto' }}>
-                            <p className="lp-body" style={{ marginBottom: '24px' }}>{selectedCompetition.description}</p>
+                            <div style={{ marginBottom: '24px' }}>
+                                <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '12px', fontWeight: '700', color: 'var(--lp-blue)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Description</h4>
+                                <p className="lp-body" style={{ fontSize: '15px', color: 'var(--lp-text-primary)', lineHeight: '1.7' }}>{selectedCompetition.description}</p>
+                            </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px', padding: '20px', background: 'var(--lp-gray)', borderRadius: '12px', border: '1px solid var(--lp-border)' }}>
                                 <div>
-                                    <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '14px', marginBottom: '8px', color: 'var(--lp-navy)' }}>Eligibility</h4>
+                                    <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '13px', fontWeight: '700', marginBottom: '10px', color: 'var(--lp-navy)' }}>Eligibility</h4>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--lp-text-secondary)' }}>
                                         <Users size={16} /> {selectedCompetition.eligibility}
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '14px', marginBottom: '8px', color: 'var(--lp-navy)' }}>Dates</h4>
+                                    <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '13px', fontWeight: '700', marginBottom: '10px', color: 'var(--lp-navy)' }}>Important Dates</h4>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--lp-text-secondary)' }}>
                                         <Calendar size={16} /> {selectedCompetition.startDate} - {selectedCompetition.endDate}
                                     </div>
-                                    <div style={{ fontSize: '13px', color: 'var(--lp-text-secondary)', marginTop: '4px' }}>
+                                    <div style={{ fontSize: '13px', color: 'var(--lp-blue)', fontWeight: '600', marginTop: '6px' }}>
                                         Deadline: {selectedCompetition.deadline}
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '14px', marginBottom: '12px', color: 'var(--lp-navy)' }}>Required Domains / Skills</h4>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                <h4 style={{ fontFamily: 'var(--lp-font-heading)', fontSize: '12px', fontWeight: '700', color: 'var(--lp-blue)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>Required Domains & Skills</h4>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                                     {selectedCompetition.skills.map((skill, index) => (
-                                        <span key={index} className="in-tag">{skill}</span>
+                                        <span key={index} className="in-tag" style={{ padding: '6px 14px', fontSize: '13px', background: 'white', boxShadow: '0 2px 4px rgba(0,0,0,0.04)' }}>
+                                            {skill}
+                                        </span>
                                     ))}
                                 </div>
                             </div>
@@ -363,6 +433,57 @@ export default function CompetitionsPage() {
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                                 <button type="button" className="lp-btn lp-btn--outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</button>
                                 <button type="submit" className="lp-btn lp-btn--primary">Post Now</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            {/* ── Edit Competition Modal ── */}
+            {isEditModalOpen && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(13, 27, 42, 0.4)', backdropFilter: 'blur(4px)',
+                    zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px'
+                }}>
+                    <div style={{
+                        backgroundColor: 'var(--lp-white)', borderRadius: '12px', width: '100%', maxWidth: '500px',
+                        boxShadow: '0 24px 64px rgba(13, 27, 42, 0.12)', border: '1px solid var(--lp-border)',
+                        display: 'flex', flexDirection: 'column', maxHeight: '90vh'
+                    }}>
+                        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--lp-border)', display: 'flex', justifyContent: 'space-between' }}>
+                            <h2 className="lp-h3">Edit Competition</h2>
+                            <button onClick={() => { setIsEditModalOpen(false); setEditingId(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleUpdateCompetition} style={{ padding: '24px', overflowY: 'auto' }}>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Title</label>
+                                <input type="text" className="in-input" required value={newComp.title} onChange={e => setNewComp({ ...newComp, title: e.target.value })} />
+                            </div>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Category</label>
+                                <input type="text" className="in-input" placeholder="e.g. Hackathon, Research" value={newComp.category} onChange={e => setNewComp({ ...newComp, category: e.target.value })} />
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Start Date</label>
+                                    <input type="date" className="in-input" value={newComp.startDate} onChange={e => setNewComp({ ...newComp, startDate: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>End Date</label>
+                                    <input type="date" className="in-input" value={newComp.endDate} onChange={e => setNewComp({ ...newComp, endDate: e.target.value })} />
+                                </div>
+                            </div>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Skills (comma separated)</label>
+                                <input type="text" className="in-input" placeholder="React, Python, UI/UX" value={newComp.skills} onChange={e => setNewComp({ ...newComp, skills: e.target.value })} />
+                            </div>
+                            <div style={{ marginBottom: '24px' }}>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Description</label>
+                                <textarea className="in-input" rows="3" value={newComp.description} onChange={e => setNewComp({ ...newComp, description: e.target.value })}></textarea>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                                <button type="button" className="lp-btn lp-btn--outline" onClick={() => { setIsEditModalOpen(false); setEditingId(null); }}>Cancel</button>
+                                <button type="submit" className="lp-btn lp-btn--primary">Update Competition</button>
                             </div>
                         </form>
                     </div>

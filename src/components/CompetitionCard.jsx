@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, Users, Award, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export default function CompetitionCard({ competition, userRole, onViewDetails, onRegister }) {
+export default function CompetitionCard({ competition, userRole, onViewDetails, onRegister, onEdit }) {
 
     // Status Badge Helpers
     const getStatusStyle = (status) => {
@@ -96,14 +96,14 @@ export default function CompetitionCard({ competition, userRole, onViewDetails, 
 
                 {/* Tags */}
                 <div className="in-card-tags" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    <span className="in-tag" style={{ background: 'rgba(0, 120, 212, 0.05)', color: 'var(--lp-blue)', border: '1px solid rgba(0, 120, 212, 0.1)' }}>
+                    <span className="in-tag" style={{ background: 'rgba(0, 112, 243, 0.08)', color: 'var(--lp-blue)', border: '1px solid rgba(0, 112, 243, 0.15)' }}>
                         {competition.category}
                     </span>
                     {competition.skills.slice(0, 3).map((skill, index) => (
-                        <span key={index} className="in-tag">{skill}</span>
+                        <span key={index} className="in-tag" style={{ background: 'var(--lp-gray)', color: 'var(--lp-navy)' }}>{skill}</span>
                     ))}
                     {competition.skills.length > 3 && (
-                        <span className="in-tag">+{competition.skills.length - 3}</span>
+                        <span className="in-tag" style={{ background: 'transparent', border: '1px dashed var(--lp-border)' }}>+{competition.skills.length - 3}</span>
                     )}
                 </div>
             </div>
@@ -144,6 +144,24 @@ export default function CompetitionCard({ competition, userRole, onViewDetails, 
                         {userState.disabled && userState.text === 'Participated' && <CheckCircle2 size={16} style={{ marginRight: '6px' }} />}
                         {userState.disabled && userState.text === 'Winner' && <Award size={16} style={{ marginRight: '6px' }} />}
                         {userState.text}
+                    </button>
+                )}
+
+                {userRole === 'Admin' && (
+                    <button
+                        className="in-btn"
+                        onClick={() => onEdit(competition)}
+                        style={{
+                            flex: 1,
+                            marginLeft: '8px',
+                            justifyContent: 'center',
+                            backgroundColor: 'var(--lp-blue)',
+                            color: 'var(--lp-white)',
+                            border: 'none',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Edit
                     </button>
                 )}
             </div>
