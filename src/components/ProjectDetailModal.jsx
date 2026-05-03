@@ -106,7 +106,7 @@ export default function ProjectDetailModal({ project, onClose, onRequestJoin }) 
                 <div className="prj-modal-section">
                     <h4 className="prj-modal-section-title">Required Skills</h4>
                     <div className="prj-tags">
-                        {project.skills.map((skill, idx) => (
+                        {(project.skills || []).map((skill, idx) => (
                             <span key={idx} className="prj-skill-tag">{skill}</span>
                         ))}
                     </div>

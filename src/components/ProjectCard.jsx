@@ -39,11 +39,11 @@ export default function ProjectCard({ project, onRequestJoin, onViewDetails }) {
 
                 {/* Skills */}
                 <div className="prj-tags">
-                    {project.skills.slice(0, 4).map((skill, idx) => (
+                    {(project.skills || []).slice(0, 4).map((skill, idx) => (
                         <span key={idx} className="prj-skill-tag">{skill}</span>
                     ))}
-                    {project.skills.length > 4 && (
-                        <span className="prj-skill-tag prj-skill-tag--more">+{project.skills.length - 4}</span>
+                    {(project.skills || []).length > 4 && (
+                        <span className="prj-skill-tag prj-skill-tag--more">+{(project.skills || []).length - 4}</span>
                     )}
                 </div>
 

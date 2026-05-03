@@ -99,11 +99,11 @@ export default function CompetitionCard({ competition, userRole, onViewDetails, 
                     <span className="in-tag" style={{ background: 'rgba(0, 112, 243, 0.08)', color: 'var(--lp-blue)', border: '1px solid rgba(0, 112, 243, 0.15)' }}>
                         {competition.category}
                     </span>
-                    {competition.skills.slice(0, 3).map((skill, index) => (
+                    {(competition.skills || []).slice(0, 3).map((skill, index) => (
                         <span key={index} className="in-tag" style={{ background: 'var(--lp-gray)', color: 'var(--lp-navy)' }}>{skill}</span>
                     ))}
-                    {competition.skills.length > 3 && (
-                        <span className="in-tag" style={{ background: 'transparent', border: '1px dashed var(--lp-border)' }}>+{competition.skills.length - 3}</span>
+                    {(competition.skills || []).length > 3 && (
+                        <span className="in-tag" style={{ background: 'transparent', border: '1px dashed var(--lp-border)' }}>+{(competition.skills || []).length - 3}</span>
                     )}
                 </div>
             </div>

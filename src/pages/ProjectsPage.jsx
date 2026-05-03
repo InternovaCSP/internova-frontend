@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Menu, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ProjectsFilterBar from '../components/ProjectsFilterBar';
 import ProjectCard from '../components/ProjectCard';
 import ProjectDetailModal from '../components/ProjectDetailModal';
-import { getProjects, joinProject, getMyRequests } from '../api/projectApi';
+import { getProjects, joinProject, getMyRequests, createProject } from '../api/projectApi';
+import CreateProjectModal from '../components/CreateProjectModal';
 
 /**
  * ProjectsPage Component
@@ -18,7 +19,9 @@ import { getProjects, joinProject, getMyRequests } from '../api/projectApi';
  */
 export default function ProjectsPage() {
     const { user } = useAuth();
+    const navigate = useNavigate();
 
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const [projects, setProjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -135,7 +138,10 @@ export default function ProjectsPage() {
                     </div>
                     <div className="in-header-actions">
                         {(user?.role === 'Admin' || user?.role === 'Company') && (
-                            <button className="in-btn in-btn-primary">
+                            <button 
+                                className="in-btn in-btn-primary"
+                                onClick={() => setShowCreateModal(true)}
+                            >
                                 <Plus size={18} /> Create Project
                             </button>
                         )}
@@ -208,6 +214,15 @@ export default function ProjectsPage() {
                 )}
 
             </div>
+            {/* Create Project Modal */}
+            {showCreateModal && (
+                <CreateProjectModal 
+                    onClose={() => setShowCreateModal(false)}
+                    onCreated={(newProject) => {
+                        setProjects(prev => [newProject, ...prev]);
+                    }}
+                />
+            )}
         </div>
     );
 }
