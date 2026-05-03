@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import {
     Building2, GraduationCap, ArrowRight, ShieldCheck,
@@ -15,7 +15,6 @@ import {
  * glassmorphism, and smooth animations in a clean LIGHT THEME.
  */
 export default function LandingPage() {
-    const [activeTab, setActiveTab] = useState('student');
 
     return (
         <div className="lp-root">
@@ -155,46 +154,6 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ── ROLE PORTALS ── */}
-            <section className="lp-section">
-                <div className="lp-container">
-                    <div className="lp-section-header" style={{ animation: 'fadeInUp 0.8s ease-out' }}>
-                        <h2 className="lp-h2">A Unified Experience</h2>
-                        <div className="lp-tabs-header" style={{ marginTop: '24px' }}>
-                            <button className={`lp-tab-btn ${activeTab === 'student' ? 'active' : ''}`} onClick={() => setActiveTab('student')}>Student</button>
-                            <button className={`lp-tab-btn ${activeTab === 'company' ? 'active' : ''}`} onClick={() => setActiveTab('company')}>Company</button>
-                            <button className={`lp-tab-btn ${activeTab === 'admin' ? 'active' : ''}`} onClick={() => setActiveTab('admin')}>Admin</button>
-                        </div>
-                    </div>
-
-                    <div className="lp-tab-content">
-                        {activeTab === 'student' && (
-                            <div className="lp-card" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--lp-gray)' }}>
-                                <div style={{ textAlign: 'center', opacity: 0.5 }}>
-                                    <UserCircle size={64} style={{ marginBottom: '16px' }} />
-                                    <p>Interactive Student Dashboard Preview</p>
-                                </div>
-                            </div>
-                        )}
-                        {activeTab === 'company' && (
-                            <div className="lp-card" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--lp-gray)' }}>
-                                <div style={{ textAlign: 'center', opacity: 0.5 }}>
-                                    <Building2 size={64} style={{ marginBottom: '16px' }} />
-                                    <p>Recruiter Pipeline Vista</p>
-                                </div>
-                            </div>
-                        )}
-                        {activeTab === 'admin' && (
-                            <div className="lp-card" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--lp-gray)' }}>
-                                <div style={{ textAlign: 'center', opacity: 0.5 }}>
-                                    <ShieldCheck size={64} style={{ marginBottom: '16px' }} />
-                                    <p>Comprehensive Admin Overview</p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </section>
 
             {/* ── TESTIMONIALS ── */}
             <section className="lp-section-alt">

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import CreateProjectModal from '../components/CreateProjectModal';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getProjects, createProject, deleteProject } from '../api/projectApi';
+import { getProjects, deleteProject } from '../api/projectApi';
 import {
     FolderKanban, Plus, Search, Bell, ArrowLeft, Loader2, AlertCircle,
-    CheckCircle, X, Users, Clock, Tag, FileText, ChevronDown, Trash2, Eye,
-    Hash, Wrench
+    Trash2, Eye
 } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 
@@ -18,6 +18,7 @@ import AdminSidebar from '../components/AdminSidebar';
 export default function AdminProjectsPage() {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -25,7 +26,17 @@ export default function AdminProjectsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
 
-    useEffect(() => { loadData(); }, []);
+    useEffect(() => { 
+        loadData(); 
+        
+        // Check if we should open the create modal immediately
+        const params = new URLSearchParams(location.search);
+        if (params.get('create') === 'true') {
+            setShowCreateModal(true);
+            // Clean up the URL
+            navigate('/admin/projects', { replace: true });
+        }
+    }, [location.search]);
 
     const loadData = async () => {
         try {
@@ -205,9 +216,23 @@ export default function AdminProjectsPage() {
                             <h2 style={{ color: '#0f172a', fontSize: '24px', marginBottom: '8px', fontWeight: 700 }}>
                                 {searchQuery ? 'No Matching Projects' : 'No Projects Yet'}
                             </h2>
-                            <p style={{ color: '#64748b', margin: 0 }}>
+                            <p style={{ color: '#64748b', margin: '0 0 24px 0' }}>
                                 {searchQuery ? 'Try a different search term.' : 'Create your first project to get started.'}
                             </p>
+                            {!searchQuery && (
+                                <button
+                                    onClick={() => setShowCreateModal(true)}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '8px',
+                                        padding: '12px 24px', borderRadius: '10px',
+                                        background: '#2563eb', border: 'none', color: 'white',
+                                        fontWeight: 600, fontSize: '14px', cursor: 'pointer',
+                                        margin: '0 auto'
+                                    }}
+                                >
+                                    <Plus size={18} /> Create First Project
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>

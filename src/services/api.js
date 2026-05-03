@@ -27,7 +27,8 @@ export const competitionApi = {
     getById: (id) => api.get(`/competitions/${id}`),
     create: (data) => api.post('/competitions', data),
     update: (id, data) => api.put(`/competitions/${id}`, data),
-    delete: (id) => api.delete(`/competitions/${id}`)
+    delete: (id) => api.delete(`/competitions/${id}`),
+    register: (id) => api.post(`/competitions/${id}/register`)
 };
 
 export const seminarApi = {

@@ -3835,6 +3835,17 @@ body {
   box-shadow: none;
 }
 
+.prj-btn--danger {
+  background: #fff1f2;
+  color: #e11d48;
+  border-color: #fecdd3;
+}
+
+.prj-btn--danger:hover {
+  background: #ffe4e6;
+  border-color: #fb7185;
+}
+
 /* ── Grid Meta ── */
 .prj-grid-meta {
   display: flex;
