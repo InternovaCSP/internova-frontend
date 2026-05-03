@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
+    Home,
     LayoutDashboard, 
     Building2, 
     Users, 
@@ -26,6 +27,11 @@ const AdminSidebar = () => {
 
     const menuItems = [
         { 
+            name: 'Home', 
+            icon: <Home size={20} />, 
+            path: '/' 
+        },
+        { 
             name: 'Dashboard', 
             icon: <LayoutDashboard size={20} />, 
             path: '/admin/dashboard' 
@@ -45,11 +51,7 @@ const AdminSidebar = () => {
             icon: <FolderKanban size={20} />, 
             path: '/admin/projects' 
         },
-        { 
-            name: 'User Management', 
-            icon: <Users size={20} />, 
-            path: '/admin/users' 
-        },
+
         { 
             name: 'Settings', 
             icon: <Settings size={20} />, 

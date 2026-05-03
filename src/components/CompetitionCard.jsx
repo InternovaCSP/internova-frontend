@@ -1,8 +1,8 @@
 import React from 'react';
-import { Calendar, Users, Award, CheckCircle2 } from 'lucide-react';
+import { Calendar, Users, Award, CheckCircle2, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export default function CompetitionCard({ competition, userRole, onViewDetails, onRegister }) {
+export default function CompetitionCard({ competition, userRole, onViewDetails, onRegister, onEdit, onDelete }) {
 
     // Status Badge Helpers
     const getStatusStyle = (status) => {
@@ -33,119 +33,118 @@ export default function CompetitionCard({ competition, userRole, onViewDetails, 
         }
     };
 
-    const statusStyle = getStatusStyle(competition.status);
+    const statusConfig = {
+        'Upcoming': { bg: 'rgba(0, 120, 212, 0.08)', color: '#0369a1', label: 'Upcoming' },
+        'Ongoing': { bg: 'rgba(29, 137, 84, 0.08)', color: '#15803d', label: 'Ongoing' },
+        'Closed': { bg: '#f1f5f9', color: '#64748b', label: 'Closed' }
+    };
+
+    const statusStyle = statusConfig[competition.status] || statusConfig['Closed'];
     const userState = getUserStatusConfig(competition.currentUserStatus);
+    const isAdmin = userRole === 'Admin';
 
     return (
-        <div className="in-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            {/* Header */}
-            <div className="in-card-header" style={{ marginBottom: '16px' }}>
+        <div className="prj-card">
+            {/* ── Header ── */}
+            <div className="prj-card-header">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
-                        <h3 className="in-card-title" style={{ fontSize: '18px' }}>{competition.title}</h3>
-                        <p className="in-card-company" style={{ fontSize: '13px', color: 'var(--lp-text-secondary)' }}>
-                            {competition.organizer}
-                        </p>
+                        <h3 className="prj-card-title">{competition.title}</h3>
+                        <span className="prj-leader" style={{ fontSize: '13px' }}>Organized by {competition.organizer}</span>
                     </div>
-                    {/* Status Badge */}
-                    <span
-                        className="in-badge"
-                        style={{ backgroundColor: statusStyle.bg, color: statusStyle.color }}
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {isAdmin && onDelete && (
+                            <button
+                                className="prj-btn prj-btn--danger"
+                                style={{ padding: '6px', borderRadius: '6px' }}
+                                onClick={(e) => { e.stopPropagation(); onDelete(competition.id); }}
+                                title="Delete Competition"
+                            >
+                                <Trash2 size={14} />
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                <div className="prj-card-meta" style={{ marginTop: '10px' }}>
+                    <span 
+                        className="prj-badge" 
+                        style={{ backgroundColor: statusStyle.bg, color: statusStyle.color, borderColor: 'rgba(0,0,0,0.05)' }}
                     >
-                        {competition.status}
+                        {statusStyle.label}
                     </span>
-                </div>
-            </div>
-
-            {/* Winner Badge (If Applicable) */}
-            {competition.currentUserStatus === 'Won' && (
-                <div style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '6px',
-                    backgroundColor: 'rgba(249, 168, 37, 0.15)', color: '#d68f1c',
-                    padding: '4px 10px', borderRadius: '6px', fontSize: '12px',
-                    fontWeight: '600', marginBottom: '16px', width: 'fit-content'
-                }}>
-                    <Award size={14} /> Winner Achieved
-                </div>
-            )}
-
-            {/* Body */}
-            <div className="in-card-body" style={{ flexGrow: 1 }}>
-                <p className="in-card-desc" style={{
-                    fontSize: '14px',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    marginBottom: '16px'
-                }}>
-                    {competition.description}
-                </p>
-
-                {/* Metadata Row */}
-                <div className="in-card-meta-row" style={{ display: 'flex', gap: '16px', marginBottom: '16px', fontSize: '13px' }}>
-                    <div className="in-card-meta-item" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Calendar size={14} className="in-card-meta-icon" />
-                        <span>Deadline: {competition.deadline}</span>
-                    </div>
-                    <div className="in-card-meta-item" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Users size={14} className="in-card-meta-icon" />
-                        <span>{competition.eligibility}</span>
-                    </div>
-                </div>
-
-                {/* Tags */}
-                <div className="in-card-tags" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    <span className="in-tag" style={{ background: 'rgba(0, 120, 212, 0.05)', color: 'var(--lp-blue)', border: '1px solid rgba(0, 120, 212, 0.1)' }}>
+                    <span className="prj-badge prj-badge--innovation-lab">
                         {competition.category}
                     </span>
-                    {competition.skills.slice(0, 3).map((skill, index) => (
-                        <span key={index} className="in-tag">{skill}</span>
-                    ))}
-                    {competition.skills.length > 3 && (
-                        <span className="in-tag">+{competition.skills.length - 3}</span>
+                    {competition.currentUserStatus === 'Won' && (
+                        <span className="prj-badge prj-badge--featured">
+                            <Award size={11} fill="currentColor" /> Winner
+                        </span>
                     )}
                 </div>
             </div>
 
-            {/* Footer */}
-            <div className="in-card-footer" style={{
-                marginTop: '20px',
-                paddingTop: '16px',
-                borderTop: '1px solid var(--lp-border)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-            }}>
-                <button
-                    className="in-btn in-btn-outline"
-                    onClick={() => onViewDetails(competition)}
-                    style={{ flex: 1, marginRight: '8px', justifyContent: 'center' }}
-                >
-                    View Details
-                </button>
+            {/* ── Body ── */}
+            <div className="prj-card-body">
+                <p className="prj-card-desc">
+                    {competition.description}
+                </p>
 
-                {userRole === 'Student' && (
-                    <button
-                        className={`in-btn ${userState.disabled ? '' : 'in-btn-teal'}`}
-                        disabled={userState.disabled}
-                        onClick={() => !userState.disabled && onRegister(competition.id)}
-                        style={{
-                            flex: 1,
-                            marginLeft: '8px',
-                            justifyContent: 'center',
-                            backgroundColor: userState.bg,
-                            color: userState.color,
-                            border: '1px solid transparent',
-                            cursor: userState.disabled ? 'default' : 'pointer'
-                        }}
-                    >
-                        {userState.disabled && userState.text === 'Registered' && <CheckCircle2 size={16} style={{ marginRight: '6px' }} />}
-                        {userState.disabled && userState.text === 'Participated' && <CheckCircle2 size={16} style={{ marginRight: '6px' }} />}
-                        {userState.disabled && userState.text === 'Winner' && <Award size={16} style={{ marginRight: '6px' }} />}
-                        {userState.text}
-                    </button>
-                )}
+                {/* Tags */}
+                <div className="prj-tags">
+                    {(competition.skills || []).slice(0, 3).map((skill, index) => (
+                        <span key={index} className="prj-skill-tag">{skill}</span>
+                    ))}
+                    {(competition.skills || []).length > 3 && (
+                        <span className="prj-skill-tag prj-skill-tag--more">+{(competition.skills || []).length - 3}</span>
+                    )}
+                </div>
+
+                {/* Info Row */}
+                <div className="prj-info-row">
+                    <div className="prj-info-item">
+                        <Calendar size={14} />
+                        <span>Deadline: {competition.deadline}</span>
+                    </div>
+                    <div className="prj-info-item">
+                        <Users size={14} />
+                        <span>{competition.eligibility}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Footer ── */}
+            <div className="prj-card-footer">
+                <div className="prj-footer-left">
+                    {competition.currentUserStatus && competition.currentUserStatus !== 'Won' && (
+                        <div className="prj-user-status" style={{ backgroundColor: userState.bg, color: userState.color }}>
+                            <CheckCircle2 size={13} /> {userState.text}
+                        </div>
+                    )}
+                </div>
+
+                <div className="prj-footer-actions">
+                    <button className="prj-btn prj-btn--outline" onClick={() => onViewDetails(competition)}>View Details</button>
+
+                    {isAdmin ? (
+                        <button
+                            className="prj-btn prj-btn--primary"
+                            onClick={(e) => { e.stopPropagation(); onEdit(competition); }}
+                        >
+                            Edit Competition
+                        </button>
+                    ) : (
+                        userRole === 'Student' && (
+                            <button
+                                className={`prj-btn ${userState.disabled ? 'prj-btn--disabled' : 'prj-btn--accent'}`}
+                                disabled={userState.disabled}
+                                onClick={() => !userState.disabled && onRegister(competition.id)}
+                            >
+                                {userState.text}
+                            </button>
+                        )
+                    )}
+                </div>
             </div>
         </div>
     );
