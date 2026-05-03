@@ -27,8 +27,18 @@ export default function CompetitionsPage() {
     const [eligibilityFilter, setEligibilityFilter] = useState('');
     const [sortBy, setSortBy] = useState('newest');
 
-    // Details Modal State
+    // Modal States
     const [selectedCompetition, setSelectedCompetition] = useState(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [newComp, setNewComp] = useState({
+        title: '',
+        description: '',
+        category: '',
+        eligibilityCriteria: '',
+        startDate: '',
+        endDate: '',
+        skills: ''
+    });
 
     // Initial Load
     useEffect(() => {
@@ -37,18 +47,16 @@ export default function CompetitionsPage() {
             try {
                 const response = await competitionApi.getAll();
                 const mappedData = response.data.map(comp => ({
-                    id: comp.id,
-                    title: comp.title,
-                    organizer: comp.organizerName || 'Unknown Organizer',
+                    ...comp,
+                    organizer: comp.organizerName || 'University Organizer',
                     description: comp.description || 'No description available.',
                     category: comp.category || 'General',
-                    status: new Date(comp.endDate) < new Date() ? 'Completed' : 'Upcoming',
+                    status: new Date(comp.endDate) < new Date() ? 'Closed' : 'Upcoming',
                     eligibility: comp.eligibilityCriteria || 'Open to all students',
                     startDate: comp.startDate ? new Date(comp.startDate).toLocaleDateString() : 'TBD',
                     endDate: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
                     deadline: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
-                    skills: comp.category ? [comp.category] : ['General'], // Fallback since backend lacks skills
-                    currentUserStatus: null // This would come from a participation API if implemented
+                    skills: comp.skills ? comp.skills.split(',').map(s => s.trim()) : []
                 }));
                 setCompetitions(mappedData);
             } catch (error) {
@@ -62,17 +70,53 @@ export default function CompetitionsPage() {
     }, []);
 
     // Registration Handler
-    const handleRegister = (id) => {
-        setCompetitions(prev => prev.map(comp => {
-            if (comp.id === id) {
-                return { ...comp, currentUserStatus: 'Registered' };
-            }
-            return comp;
-        }));
+    const handleRegister = async (id) => {
+        try {
+            await competitionApi.register(id);
+            setCompetitions(prev => prev.map(comp => {
+                if (comp.id === id) {
+                    return { ...comp, currentUserStatus: 'Registered' };
+                }
+                return comp;
+            }));
 
-        // Update modal state if it's currently open
-        if (selectedCompetition && selectedCompetition.id === id) {
-            setSelectedCompetition(prev => ({ ...prev, currentUserStatus: 'Registered' }));
+            // Update modal state if it's currently open
+            if (selectedCompetition && selectedCompetition.id === id) {
+                setSelectedCompetition(prev => ({ ...prev, currentUserStatus: 'Registered' }));
+            }
+        } catch (error) {
+            console.error('Registration failed:', error);
+            alert(error.response?.data?.error || 'Failed to register for competition.');
+        }
+    };
+
+    const handleCreateCompetition = async (e) => {
+        e.preventDefault();
+        try {
+            const payload = {
+                ...newComp,
+                organizerId: user.userId
+            };
+            await competitionApi.create(payload);
+            setIsCreateModalOpen(false);
+            setNewComp({ title: '', description: '', category: '', eligibilityCriteria: '', startDate: '', endDate: '', skills: '' });
+            // Refresh list
+            const response = await competitionApi.getAll();
+            const mappedData = response.data.map(comp => ({
+                ...comp,
+                organizer: comp.organizerName || 'University Organizer',
+                description: comp.description || 'No description available.',
+                category: comp.category || 'General',
+                status: new Date(comp.endDate) < new Date() ? 'Closed' : 'Upcoming',
+                eligibility: comp.eligibilityCriteria || 'Open to all students',
+                startDate: comp.startDate ? new Date(comp.startDate).toLocaleDateString() : 'TBD',
+                endDate: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
+                deadline: comp.endDate ? new Date(comp.endDate).toLocaleDateString() : 'TBD',
+                skills: comp.skills ? comp.skills.split(',').map(s => s.trim()) : []
+            }));
+            setCompetitions(mappedData);
+        } catch (error) {
+            console.error('Failed to create competition:', error);
         }
     };
 
@@ -129,7 +173,7 @@ export default function CompetitionsPage() {
                     </div>
                     <div className="in-header-actions">
                         {user?.role === 'Admin' && (
-                            <button className="in-btn in-btn-primary">
+                            <button className="in-btn in-btn-primary" onClick={() => setIsCreateModalOpen(true)}>
                                 <Plus size={18} /> Post Competition
                             </button>
                         )}
@@ -270,6 +314,57 @@ export default function CompetitionsPage() {
                                 </button>
                             )}
                         </div>
+                    </div>
+                </div>
+            )}
+            {/* ── Create Competition Modal ── */}
+            {isCreateModalOpen && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(13, 27, 42, 0.4)', backdropFilter: 'blur(4px)',
+                    zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px'
+                }}>
+                    <div style={{
+                        backgroundColor: 'var(--lp-white)', borderRadius: '12px', width: '100%', maxWidth: '500px',
+                        boxShadow: '0 24px 64px rgba(13, 27, 42, 0.12)', border: '1px solid var(--lp-border)',
+                        display: 'flex', flexDirection: 'column', maxHeight: '90vh'
+                    }}>
+                        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--lp-border)', display: 'flex', justifyContent: 'space-between' }}>
+                            <h2 className="lp-h3">Post New Competition</h2>
+                            <button onClick={() => setIsCreateModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleCreateCompetition} style={{ padding: '24px', overflowY: 'auto' }}>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Title</label>
+                                <input type="text" className="in-input" required value={newComp.title} onChange={e => setNewComp({ ...newComp, title: e.target.value })} />
+                            </div>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Category</label>
+                                <input type="text" className="in-input" placeholder="e.g. Hackathon, Research" value={newComp.category} onChange={e => setNewComp({ ...newComp, category: e.target.value })} />
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Start Date</label>
+                                    <input type="date" className="in-input" value={newComp.startDate} onChange={e => setNewComp({ ...newComp, startDate: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>End Date</label>
+                                    <input type="date" className="in-input" value={newComp.endDate} onChange={e => setNewComp({ ...newComp, endDate: e.target.value })} />
+                                </div>
+                            </div>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Skills (comma separated)</label>
+                                <input type="text" className="in-input" placeholder="React, Python, UI/UX" value={newComp.skills} onChange={e => setNewComp({ ...newComp, skills: e.target.value })} />
+                            </div>
+                            <div style={{ marginBottom: '24px' }}>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Description</label>
+                                <textarea className="in-input" rows="3" value={newComp.description} onChange={e => setNewComp({ ...newComp, description: e.target.value })}></textarea>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                                <button type="button" className="lp-btn lp-btn--outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</button>
+                                <button type="submit" className="lp-btn lp-btn--primary">Post Now</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
