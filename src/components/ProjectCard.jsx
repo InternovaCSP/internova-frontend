@@ -1,8 +1,8 @@
 import React from 'react';
-import { Users, Clock, CheckCircle2, ChevronRight, Star, Settings } from 'lucide-react';
+import { Users, Clock, CheckCircle2, ChevronRight, Star, Settings, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export default function ProjectCard({ project, onRequestJoin, onViewDetails }) {
+export default function ProjectCard({ project, onRequestJoin, onViewDetails, onDelete }) {
     const { user } = useAuth();
 
     const statusConfig = {
@@ -14,13 +14,25 @@ export default function ProjectCard({ project, onRequestJoin, onViewDetails }) {
     const currentStatus = statusConfig[project.currentUserStatus];
     const isFull = project.availableSlots === 0;
     const isLeader = user?.userId && project.leaderId && String(user.userId) === String(project.leaderId);
+    const isAdmin = user?.role === 'Admin';
 
     return (
         <div className="prj-card">
-
-            {/* ── Header ── */}
+            {/* ... rest of header ... */}
             <div className="prj-card-header">
-                <h3 className="prj-card-title">{project.title}</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <h3 className="prj-card-title">{project.title}</h3>
+                    {(isAdmin || isLeader) && onDelete && (
+                        <button 
+                            className="prj-btn prj-btn--danger" 
+                            style={{ padding: '6px', borderRadius: '6px' }}
+                            onClick={(e) => { e.stopPropagation(); onDelete(project.id); }}
+                            title="Delete Project"
+                        >
+                            <Trash2 size={14} />
+                        </button>
+                    )}
+                </div>
                 <div className="prj-card-meta">
                     <span className={`prj-badge prj-badge--${project.category.toLowerCase().replace(/\s+/g, '-')}`}>
                         {project.category}

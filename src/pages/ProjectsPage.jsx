@@ -84,8 +84,20 @@ export default function ProjectsPage() {
                 return project;
             }));
         } catch (error) {
-            console.error('Failed to join project:', error);
             alert(error.response?.data?.error || "Failed to send request.");
+        }
+    };
+
+    const handleDelete = async (projectId) => {
+        if (!window.confirm('Are you sure you want to delete this project?')) return;
+        
+        try {
+            await deleteProject(projectId);
+            setProjects(prev => prev.filter(p => p.id !== projectId));
+            if (selectedProject?.id === projectId) setSelectedProject(null);
+        } catch (error) {
+            console.error('Failed to delete project:', error);
+            alert("Failed to delete project. You may not have permission.");
         }
     };
 
@@ -197,6 +209,7 @@ export default function ProjectsPage() {
                                         project={project}
                                         onRequestJoin={handleRequestJoin}
                                         onViewDetails={setSelectedProject}
+                                        onDelete={handleDelete}
                                     />
                                 ))}
                             </div>
@@ -210,6 +223,7 @@ export default function ProjectsPage() {
                         project={selectedProject}
                         onClose={() => setSelectedProject(null)}
                         onRequestJoin={handleRequestJoin}
+                        onDelete={handleDelete}
                     />
                 )}
 
