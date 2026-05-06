@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { 
-    Building2, Bell, Search, Users, Briefcase, GraduationCap, TrendingUp, ChevronRight, FolderKanban 
+    Building2, Bell, Search, Users, Briefcase, GraduationCap, TrendingUp, ChevronRight, FolderKanban, Plus 
 } from 'lucide-react'
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
