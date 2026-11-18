@@ -1,25 +1,19 @@
-/**
- * main.jsx
- * Entry point for the InterNova React frontend application.
- * Bootstraps the React DOM, wraps the application in StrictMode for development checks,
- * initializes React Router (BrowserRouter), and injects the global Authentication Context.
- */
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
-import { ThemeProvider } from './context/ThemeContext'
-import App from './App.jsx'
-import './index.css'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './shared/context/AuthContext';
+import { ThemeProvider } from './shared/context/ThemeContext';
+import App from './App.jsx';
+import './styles/index.css';
 
 createRoot(document.getElementById('root')).render(
-    <StrictMode>
-        <BrowserRouter>
-            <AuthProvider>
-                <ThemeProvider>
-                    <App />
-                </ThemeProvider>
-            </AuthProvider>
-        </BrowserRouter>
-    </StrictMode>,
-)
+  <StrictMode>
+    <BrowserRouter>
+      <AuthProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  </StrictMode>
+);
